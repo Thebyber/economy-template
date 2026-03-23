@@ -1,6 +1,8 @@
 import Phaser from "phaser";
 import { BumpkinContainer } from "game/BumpkinContainer";
 import { $gameState } from "lib/gameStore";
+import { RESOURCE_CONFIG } from "config/resources.config";
+import { AUDIO_CONFIG } from "config/audio.config";
 
 export class MainScene extends Phaser.Scene {
   private player?: BumpkinContainer;
@@ -18,6 +20,12 @@ export class MainScene extends Phaser.Scene {
       frameWidth: 14,
       frameHeight: 18,
     });
+
+    // Demo: bundled asset from `images` repo (same as React `ResourceImage name="wood"`).
+    this.load.image("demo_wood", RESOURCE_CONFIG.wood.url);
+    if (AUDIO_CONFIG.button.url) {
+      this.load.audio("demo_button_sfx", [AUDIO_CONFIG.button.url]);
+    }
   }
 
   create() {
@@ -29,6 +37,14 @@ export class MainScene extends Phaser.Scene {
     this.player = new BumpkinContainer(this, cx, cy);
     this.cursors = this.input.keyboard?.createCursorKeys();
 
+    const wood = this.add
+      .image(cx + 72, cy - 8, "demo_wood")
+      .setOrigin(0.5)
+      .setScale(2);
+    wood.setDepth(1);
+
+    this.input.keyboard?.on("keydown-SPACE", this.playDemoSfx);
+
     this.events.on(Phaser.Scenes.Events.POST_UPDATE, this.snapPlayerToPixels, this);
 
     this.unsubGameState = $gameState.subscribe(() => {
@@ -37,10 +53,19 @@ export class MainScene extends Phaser.Scene {
 
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.events.off(Phaser.Scenes.Events.POST_UPDATE, this.snapPlayerToPixels, this);
+      this.input.keyboard?.off("keydown-SPACE", this.playDemoSfx);
       this.unsubGameState?.();
       this.unsubGameState = undefined;
     });
   }
+
+  private playDemoSfx = () => {
+    if (this.cache.audio.exists("demo_button_sfx")) {
+      this.sound.play("demo_button_sfx", {
+        volume: AUDIO_CONFIG.button.volume,
+      });
+    }
+  };
 
   private snapPlayerToPixels = () => {
     if (!this.player?.body) return;

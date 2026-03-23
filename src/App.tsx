@@ -108,8 +108,8 @@ export const App: React.FC = () => {
 
       <p className="text-xs text-[#c0cbdc] max-w-md text-center opacity-90">
         Guidelines: <code className="text-[#e4a672]">docs/</code> · Arrow keys
-        move the bumpkin · Env:{" "}
-        <code className="text-[#e4a672]">.env.sample</code>
+        move the bumpkin · <strong className="text-[#e4a672]">Space</strong> plays
+        demo SFX · Env: <code className="text-[#e4a672]">.env.sample</code>
       </p>
     </div>
   );
