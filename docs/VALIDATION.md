@@ -35,6 +35,11 @@ Before calling a mini-game **shippable**, a human must manually confirm the chec
 - [ ] Copy is **PG** and **brief** (`DESIGN.md`).
 - [ ] No placeholder **TODO** left in user-visible strings.
 
+### Art (Phaser)
+
+- [ ] World tiles and pickups use **`@sl-assets`** via **`icons.config.ts` / `resources.config.ts`** (see **`src/examples/pacman/pacman.config.ts`** if you ship that example), not ad-hoc URLs or `Graphics`-drawn stand-ins.
+- [ ] Bumpkin roles use **`BumpkinContainer`** (animation CDN + silhouette), not primitive shapes.
+
 ### Performance (smoke)
 
 - [ ] No obvious **memory** growth over 10 minutes of casual play (subjective check).

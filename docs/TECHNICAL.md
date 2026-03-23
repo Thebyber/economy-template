@@ -67,6 +67,11 @@
 - UI icons: `src/config/icons.config.ts` → `<Icon name="disc" />` (10 examples included).
 - Materials: `src/config/resources.config.ts` → `<ResourceImage name="wood" />` (10 examples included).
 
+### Optional example: Bumpkin maze (`src/examples/pacman/`)
+
+- **`PacmanScene`** preloads from **`icons.config.ts` / `resources.config.ts`** (via **`examples/pacman/pacman.config.ts`**), not ad-hoc URLs.
+- **Walls** = tiled **resource** sprites; **pickups** = **icon** + **resource** keys (`PACMAN_VISUAL`). **Player and chasers** = **`BumpkinContainer`**. Mount **`PacmanExample`** if you want this scene; default **`PhaserGame`** uses **`MainScene`** only.
+
 ## Agent checklist (before editing)
 
 1. Read `GAME_SPEC.md` for numbers/copy tied to your change.

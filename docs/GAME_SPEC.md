@@ -6,56 +6,82 @@
 
 Before changing code, update this spec when you alter: **starting resources**, **win/lose conditions**, **timers**, **costs**, **enemy counts**, or **progression tiers**. Agents should read this file when implementing balance or UI copy tied to rules.
 
+**Default shell:** `App` + `PhaserGame` run **`MainScene`** (walking bumpkin + demo resource). That is the product surface unless you replace it.
+
+When changing **Phaser visuals**, read **`ART.md`** and keep walls/pickups mapped to **`icons.config.ts` / `resources.config.ts`** (`@sl-assets`) — do not introduce one-off URLs or vector-drawn gameplay tiles where pixel assets exist.
+
 ---
 
-## Game identity
+## Game identity (your fork)
 
 - **Working title:** _[your game name]_
 - **One-line pitch:** _[what the player does in one sentence]_
 
 ## Core loop (fill in)
 
-1. _[Step 1 — e.g. gather resource]_
-2. _[Step 2 — e.g. spend at station]_
-3. _[Step 3 — e.g. unlock upgrade]_
+1. _[Step 1]_
+2. _[Step 2]_
+3. _[Step 3]_
 
-**Target:** Player understands loop in **~10 seconds**; first full loop within **~60 seconds** (adjust in `DESIGN.md` context).
+## Win / lose (your fork)
 
-## Win / lose
-
-- **Win condition:** _[e.g. reach score X, survive Y seconds, craft Z]_
-- **Lose condition:** _[e.g. run out of lives, timer hits 0]_
+- **Win condition:** _[e.g. reach score X, survive Y seconds]_
+- **Lose condition:** _[e.g. run out of lives]_
 - **Retry:** _[what resets vs what persists]_
 
-## Resources
+## Resources (your fork)
 
-| Resource | Type (inflating / sink / tradeable) | Notes |
-|----------|--------------------------------------|--------|
-| Coins | | |
+| Resource | Type | Notes |
+|----------|------|-------|
+| Coins | profile (stub) | `$gameState.coins` from `loadPlayerProfile` |
 | _[add rows]_ | | |
 
-## Costs & rewards
+---
 
-| Action / upgrade | Cost | Reward |
-|------------------|------|--------|
-| | | |
+## Optional reference: Bumpkin maze (`src/examples/pacman/`)
 
-## Progression
+> **Not** loaded by default. Mount **`PacmanExample`** from `examples/pacman/PacmanExample` if you want this scene (see `src/examples/README.md`).
 
-- **Tier 1:** _
-- **Tier 2:** _
-- **Tier 3:** _
+### Identity
 
-## Copy & strings
+- **Pitch:** Arrow keys move your bumpkin on a grid; collect pickups; avoid rival bumpkins; walls are **resource** sprites from `@sl-assets`.
 
-- **Welcome popup summary:** _
-- **Win title:** _
-- **Lose title:** _
+### Loop & rules
 
-## Out of scope (this template)
+1. Navigate with queued turns at tile centers (`examples/pacman/PacmanScene.ts`).
+2. Small pickup +10 score, large +50; win when no pickups remain.
+3. **3** lives; caught by chaser costs 1 life; **0** lives = lose.
 
-- This file does **not** replace `DESIGN.md` (philosophy) or `TECHNICAL.md` (implementation).
+**Retry:** **Play again** in the example overlay restarts `PacmanScene`. **Best score** lives in **`$pacmanExampleState`** (`pacmanExampleStore.ts`), not `$gameState`.
+
+### Visual asset mapping
+
+| Role | Implementation | Config / source |
+|------|----------------|-----------------|
+| Player | `BumpkinContainer` | `PACMAN_PLAYER_TOKEN` in `src/examples/pacman/pacman.config.ts` |
+| Chasers | `BumpkinContainer` × N | `PACMAN_GHOST_TOKENS` in same file |
+| Wall cells (`#`) | Phaser `image` per cell | `PACMAN_VISUAL.wallResource` → `RESOURCE_CONFIG` (default **stone**) |
+| Small pickup | Phaser `image` | `PACMAN_VISUAL.pelletIcon` → `ICON_CONFIG` (default **disc**) |
+| Large pickup | Phaser `image` | `PACMAN_VISUAL.powerResource` → `RESOURCE_CONFIG` (default **diamond**) |
+| Silhouette / shadow | Phaser preload | `public/game/silhouette.webp`, `public/game/shadow.png` |
+
+**Agents:** Change keys only in **`examples/pacman/pacman.config.ts`** (or extend `icons.config.ts` / `resources.config.ts`). Do **not** replace with `Graphics` primitives.
+
+### Maze layout
+
+- ASCII: `src/examples/pacman/maze.ts` (`RAW`). Cell size = **`SQUARE_WIDTH`** (16px).
+
+### Copy (example overlay)
+
+- **Win:** “You cleared the maze!”
+- **Lose:** “Game over”
+
+---
+
+## Out of scope (this file)
+
+- Does **not** replace `DESIGN.md` (philosophy) or `TECHNICAL.md` (implementation).
 
 ## Related docs
 
-- `DESIGN.md`, `VALIDATION.md`, `API.md`
+- `DESIGN.md`, `VALIDATION.md`, `API.md`, `ART.md`, `TECHNICAL.md`, `../src/examples/README.md`

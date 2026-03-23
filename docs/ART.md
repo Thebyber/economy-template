@@ -16,6 +16,11 @@ Use **pixel art** only — **vibrant**, **30° top-down** farming / Sunflower La
 
 - Do not substitute **CSS gradients** or **SVG illustrations** for gameplay art.
 - Do not use **non-pixel** photos as gameplay elements.
+- Do not draw **maze walls, pickups, or obstacles** with Phaser **`Graphics`** (filled rects, strokes, or arbitrary vector shapes) when the template already ships **pixel resources and icons** from `@sl-assets`. Map those roles to **`RESOURCE_CONFIG`** / **`ICON_CONFIG`** (see **`src/examples/pacman/pacman.config.ts`** for the optional Bumpkin maze sample).
+
+## Phaser characters
+
+- **Bumpkins** in-world use **`BumpkinContainer`** (`src/game/BumpkinContainer.ts`): silhouette + shadow from `public/game/`, then the remote **animation spritesheet** from `VITE_ANIMATION_URL` (or default dev CDN). Do not replace the player or NPCs with colored `Arc` / `Circle` placeholders when a bumpkin is required.
 
 ## Repo policy (this template)
 

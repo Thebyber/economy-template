@@ -12,7 +12,7 @@ This repository is a **Sunflower Land mini-game template**. Prefer **small, spec
 
 - **One popup at a time** — use `popupSingleton` + `POPUP_REGISTRY` (see `src/components/popups/`).
 - **Shared game state** — `src/lib/gameStore.ts` (`$gameState`); Phaser uses `$gameState.subscribe(...)`, React uses `useStore($gameState)`.
-- **Private art** — sibling `images` repo, imported via `@sl-assets` (`icons.config.ts`, `resources.config.ts`, `audio.config.ts`).
+- **Private art** — sibling `images` repo, imported via `@sl-assets` (`icons.config.ts`, `resources.config.ts`, `audio.config.ts`). Optional **Bumpkin maze** reference uses the same pattern under **`src/examples/pacman/`** (`pacman.config.ts` + `PacmanScene`). **Bumpkins** use `BumpkinContainer`, not vector placeholders.
 - **API / trade** — all stubs in `src/lib/api.ts` (no separate `trade.ts`).
 - **New UI control** — add a minimal primitive under `src/components/ui/` (match existing pixel panel style).
 

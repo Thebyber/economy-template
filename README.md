@@ -1,6 +1,6 @@
 # Sunflower Land — mini-game template
 
-Starter repo for **browser mini-games** set in the Sunflower Land universe: **React** (HUD, popups, panels) + **Phaser** (walking Bumpkin demo scene), a small **game store** ([Nanostores](https://github.com/nanostores/nanostores)), **stub API**, and **Howler**-ready audio — wired so you can fork and focus on design.
+Starter repo for **browser mini-games** set in the Sunflower Land universe: **React** (HUD, popups, panels) + **Phaser** (**`MainScene`** — walking **`BumpkinContainer`** + demo resource from **`@sl-assets`**), a small **game store** ([Nanostores](https://github.com/nanostores/nanostores)), **stub API**, and **Howler**-ready audio. An optional **Bumpkin maze** sample lives under **`src/examples/pacman/`** (not mounted by default).
 
 ## Quick start
 
@@ -51,6 +51,7 @@ All contributor and **AI-agent-oriented** guidelines live in **`docs/`**:
 3. **`src/config/icons.config.ts`**, **`src/config/resources.config.ts`**, **`src/config/audio.config.ts`** — extend the bundled `@sl-assets` imports (requires sibling **`images`** repo; see above).
 4. **`src/lib/popups.ts`** + **`src/components/popups/popupRegistry.tsx`** — add modal ids and bodies.
 5. **`src/game/`** — add scenes and containers; keep heavy UI in React per `TECHNICAL.md`.
+6. **`src/examples/`** (optional) — reference implementations such as the Bumpkin maze; import into your shell only if you want them (see `src/examples/README.md`).
 
 ## Included UI primitives
 

@@ -7,6 +7,7 @@
 
 - **`src/components/`** — React UI: `ui/` primitives, `popups/`, `PhaserGame.tsx`.
 - **`src/game/`** — Phaser scenes and game objects (`BumpkinContainer`, `MainScene`).
+- **`src/examples/`** — Optional demos (e.g. **`pacman/`** Bumpkin maze — not wired into default `App`).
 - **`src/lib/`** — App logic: `api.ts`, `gameStore.ts`, `popupSingleton.ts`, `popups.ts`, `audio.ts`.
 - **`src/config/`** — **`icons.config.ts`**, **`resources.config.ts`**, **`audio.config.ts`** (static imports from sibling **`../images/assets`** via `@sl-assets`).
 - **`docs/`** — Design and process markdown (this file, `TECHNICAL.md`, etc.).
@@ -20,8 +21,9 @@ src/
     popups/       # PopupProvider, modal bodies, popupRegistry
     PhaserGame.tsx
   game/           # Phaser scenes & containers only
+  examples/       # Optional reference games (not default shell)
   lib/            # API, store, singletons, audio helper
-  config/         # icons.config.ts, audio.config.ts (URLs + comments)
+  config/         # icons, resources, audio (URLs + comments)
   assets/         # Small bundled UI chrome only (e.g. input borders)
 docs/             # Specs and guidelines
 ```
