@@ -16,7 +16,8 @@
 | Layer | Package / file |
 |-------|----------------|
 | UI | React 19, Tailwind, `src/components/ui/*` |
-| Game canvas | Phaser 3, `src/game/*`, `src/components/PhaserGame.tsx` |
+| Routing | `react-router-dom` (default: Kale Kings in `src/examples/kale-kings/KaleKingsApp.tsx`) |
+| Game canvas | Phaser 3, `src/game/*`, `src/components/PhaserGame.tsx`, example scenes under `src/examples/*` |
 | Global state | `nanostores`, `src/lib/gameStore.ts` |
 | Popups | `PopupProvider`, `popupSingleton`, `src/lib/popups.ts`, `src/components/popups/*` |
 | Audio | `howler`, `src/lib/audio.ts`, `src/config/audio.config.ts` |
@@ -70,7 +71,7 @@
 ### Optional example: Bumpkin maze (`src/examples/pacman/`)
 
 - **`PacmanScene`** preloads from **`icons.config.ts` / `resources.config.ts`** (via **`examples/pacman/pacman.config.ts`**), not ad-hoc URLs.
-- **Walls** = tiled **resource** sprites; **pickups** = **icon** + **resource** keys (`PACMAN_VISUAL`). **Player and chasers** = **`BumpkinContainer`**. Mount **`PacmanExample`** if you want this scene; default **`PhaserGame`** uses **`MainScene`** only.
+- **Walls** = tiled **resource** sprites; **pickups** = **icon** + **resource** keys (`PACMAN_VISUAL`). **Player and chasers** = **`BumpkinContainer`**. Default **`App`** is **`KaleKingsApp`**; **`PacmanExample`** and **`PhaserGame`** + **`MainScene`** are alternates.
 
 ## Agent checklist (before editing)
 

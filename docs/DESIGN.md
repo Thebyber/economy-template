@@ -6,7 +6,7 @@
 
 Mini-games are set in **Sunflower Land**: a **web3 farming community** with friendly **Bumpkin** characters. Tone is **brief** and **PG**. Prefer **resource and grind** loops over pure physics gimmicks. Use a **30° top-down** presentation: **walk-around / light RPG** feel, **not** platformers, side-on, or pure top-down shooters. Aim for a **10-second** understood loop and **60-second** first completion where possible.
 
-The optional **`src/examples/pacman/`** scene reflects this: **player and chasers are bumpkins**, and **walls/pickups** reuse **`@sl-assets`** (see **`GAME_SPEC.md`** / **`examples/pacman/pacman.config.ts`**) instead of generic vector shapes. The default **`MainScene`** is the primary template demo.
+**Kale Kings** (default) and the **`examples/pacman/`** maze use **`BumpkinContainer`** and **`@sl-assets`** pickups (see **`GAME_SPEC.md`**). **`MainScene`** (via **`PhaserGame`**) remains a minimal alternate demo.
 
 ## Setting & tone
 

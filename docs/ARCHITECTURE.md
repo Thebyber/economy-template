@@ -7,7 +7,7 @@
 
 - **`src/components/`** — React UI: `ui/` primitives, `popups/`, `PhaserGame.tsx`.
 - **`src/game/`** — Phaser scenes and game objects (`BumpkinContainer`, `MainScene`).
-- **`src/examples/`** — Optional demos (e.g. **`pacman/`** Bumpkin maze — not wired into default `App`).
+- **`src/examples/`** — **`kale-kings/`** (default **`KaleKingsApp`**), **`pacman/`** maze, other demos; **`PhaserGame`** = **`MainScene`**.
 - **`src/lib/`** — App logic: `api.ts`, `gameStore.ts`, `popupSingleton.ts`, `popups.ts`, `audio.ts`.
 - **`src/config/`** — **`icons.config.ts`**, **`resources.config.ts`**, **`audio.config.ts`** (static imports from sibling **`../images/assets`** via `@sl-assets`).
 - **`docs/`** — Design and process markdown (this file, `TECHNICAL.md`, etc.).

@@ -6,7 +6,7 @@
 
 Before changing code, update this spec when you alter: **starting resources**, **win/lose conditions**, **timers**, **costs**, **enemy counts**, or **progression tiers**. Agents should read this file when implementing balance or UI copy tied to rules.
 
-**Default shell:** `App` + `PhaserGame` run **`MainScene`** (walking bumpkin + demo resource). That is the product surface unless you replace it.
+**Default shell:** `App` renders **`KaleKingsApp`** — **`/`** kingdom economy + **`/adventure`** hidden-forest Phaser run (**five** pickups, zone-based loot). Rules & numbers: **`kaleKingsRules.ts`**. Swap `App.tsx` for **`PacmanExample`** or **`PhaserGame`** if you prefer those demos.
 
 When changing **Phaser visuals**, read **`ART.md`** and keep walls/pickups mapped to **`icons.config.ts` / `resources.config.ts`** (`@sl-assets`) — do not introduce one-off URLs or vector-drawn gameplay tiles where pixel assets exist.
 
@@ -38,9 +38,57 @@ When changing **Phaser visuals**, read **`ART.md`** and keep walls/pickups mappe
 
 ---
 
-## Optional reference: Bumpkin maze (`src/examples/pacman/`)
+## Kale Kings (`src/examples/kale-kings/`)
 
-> **Not** loaded by default. Mount **`PacmanExample`** from `examples/pacman/PacmanExample` if you want this scene (see `src/examples/README.md`).
+> **Loaded by default** via **`KaleKingsApp`**. State: **`kaleKingsStore.ts`**. Constants & dice: **`kaleKingsRules.ts`**. UI uses **placeholder divs** for Magical / Golden Kale icons until final art.
+
+### Pitch
+
+Upgrade the village into a **Kale Kingdom**. You start with **1 Giant Kale** and grow the economy through passive Kale, forage runs (Phaser minigame), and area unlocks.
+
+### Currencies
+
+| Currency | Role |
+|----------|------|
+| **Kale** | Pays run entry; basic “soft” layer |
+| **Magical Kale** | Unlocks **Forest**; produced by Meadow / Forest runs |
+| **Golden Kale** | Unlocks **Mystio** (with Magical); buys **+1 Giant Kale**; produced by Forest / Mystio |
+
+### Sources
+
+| Source | Output |
+|--------|--------|
+| **Free (Giant Kale)** | Every **8 hours**, **each** Giant Kale produces **1 Kale** (kingdom **Collect**). |
+| **Meadow run** (Area I) | **1–5** Magical Kale (rolled on run success). |
+| **Forest run** | **1–10** Magical Kale, **0–1** Golden Kale. |
+| **Mystio run** | **0–3** Golden Kale. |
+
+### Sinks (costs)
+
+| Sink | Cost | Notes |
+|------|------|--------|
+| **Meadow run** | **1 Kale** | Requires Meadow (starts unlocked). |
+| **Forest run** | **5 Kale** | Requires Forest unlocked. |
+| **Mystio run** | **25 Kale** | Requires Mystio unlocked. |
+| **Unlock Forest** | **25 Magical Kale** | One-time. |
+| **Unlock Mystio** | **150 Magical** + **50 Golden** | One-time. |
+| **+1 Giant Kale** | **1 Golden Kale** | Stacks passive Kale production. |
+
+### Minigame
+
+- **Explore the hidden forest:** bumpkin walks an empty field; **5** hidden Kale pickups. Collect all → modal shows **rolled loot** for that zone → **Claim** credits Magical/Golden and returns **`/`**.
+- **Leaving via ← Kingdom** without finishing **does not refund** the run fee.
+
+### Routes
+
+| Path | Role |
+|------|------|
+| `/` | **Game-style kingdom:** full-screen scene (Giant Kale patch, bumpkin “home”), corner **HUD**, **FORAGE RUN** opens run picker (costs + unlocks), **patch tap** → harvest modal, **shop** button → buy Giant Kale |
+| `/adventure` | Phaser run (must arrive with router `state.zone` after paying on `/`) |
+
+## Bumpkin maze (`src/examples/pacman/`)
+
+> Optional — mount **`PacmanExample`** from `App.tsx` instead of **`KaleKingsApp`** (see `src/examples/README.md`).
 
 ### Identity
 

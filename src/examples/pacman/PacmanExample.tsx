@@ -12,10 +12,7 @@ import { Label } from "components/ui/Label";
 import { Button } from "components/ui/Button";
 import { playSfx } from "lib/audio";
 
-/**
- * Self-contained Bumpkin maze sample: mount this in your app or a dev route.
- * Not used by the default template shell (`App` + `PhaserGame` use `MainScene`).
- */
+/** Bumpkin maze minigame: Phaser canvas, HUD, and end-of-round overlay (`App` mounts this by default). */
 export const PacmanExample: React.FC = () => {
   const hostRef = useRef<HTMLDivElement>(null);
   const state = useStore($pacmanExampleState);
@@ -74,7 +71,7 @@ export const PacmanExample: React.FC = () => {
   return (
     <div className="w-full max-w-2xl flex flex-col gap-2">
       <div className="flex flex-wrap items-center justify-center gap-3 text-sm">
-        <Label type="formula">Bumpkin maze (example)</Label>
+        <Label type="formula">Bumpkin maze</Label>
         <Label type="default">Score {state.score}</Label>
         <Label type="default">Lives {state.lives}</Label>
         <Label type="chill">Best {state.highScore}</Label>
