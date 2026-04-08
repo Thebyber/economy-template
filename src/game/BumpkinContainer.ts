@@ -1,10 +1,13 @@
 import Phaser from "phaser";
 import { SQUARE_WIDTH } from "lib/constants";
+import { getAnimationApiBase } from "lib/portal/url";
 
 /** Default farmer look → `tokenUriBuilder` output used by the animation CDN. */
 const DEFAULT_BUMPKIN_TOKEN = "32_1_5_13_18_22_23";
 
 function animationBaseUrl(): string {
+  const fromMinigames = getAnimationApiBase();
+  if (fromMinigames) return fromMinigames;
   const raw =
     import.meta.env.VITE_ANIMATION_URL ||
     "https://animations-dev.sunflower-land.com";

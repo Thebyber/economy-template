@@ -6,6 +6,7 @@ import type { PopupRenderProps } from "lib/popups";
 import { assignAppHome } from "lib/assignAppHome";
 import { formatNpcDisplayName } from "../lib/npcDisplayName";
 import { BumpkinSheetPreview } from "./BumpkinSheetPreview";
+import { $hideAndSeekRound } from "../lib/hideAndSeekRoundStore";
 import {
   markBumpkinHunterGameOverPosting,
   postBumpkinHunterGameOver,
@@ -17,7 +18,8 @@ export const HideAndSeekGameOverPopup: React.FC<PopupRenderProps> = ({
 }) => {
   useEffect(() => {
     if (!markBumpkinHunterGameOverPosting()) return;
-    void postBumpkinHunterGameOver().catch((err) => {
+    const skullsThisRun = $hideAndSeekRound.get()?.eatProgress ?? 0;
+    void postBumpkinHunterGameOver(skullsThisRun).catch((err) => {
       console.error("Bumpkin Hunter GAMEOVER action failed:", err);
     });
   }, []);

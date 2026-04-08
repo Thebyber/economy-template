@@ -37,6 +37,7 @@ jobs:
           VITE_RELEASE_VERSION: ${{ steps.get_version.outputs.VERSION }}
           VITE_IMAGE_BASE_URL: https://sunflower-land.com/game-assets
           VITE_API_URL: https://api-dev.sunflower-land.com
+          VITE_MINIGAMES_API_URL: ${{ vars.VITE_MINIGAMES_API_URL }}
           VITE_PORTAL_GAME_URL: https://sunflower-land.com/testnet/
           VITE_ANIMATION_URL: https://animations-dev.sunflower-land.com/
 

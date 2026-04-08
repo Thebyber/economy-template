@@ -6,7 +6,7 @@
 
 Before changing code, update this spec when you alter: **starting resources**, **win/lose conditions**, **timers**, **costs**, **enemy counts**, or **progression tiers**. Agents should read this file when implementing balance or UI copy tied to rules.
 
-**Default shell:** `App` renders **`BoringApp`** — **`/`** loads the portal player-economy session (when API + JWT are configured), **`/game`** runs **`PhaserGame`** / **`MainScene`** (walking bumpkin).
+**Default shell:** `App` renders **`BoringApp`** — **`/`** loads the Minigames API player-economy session (when `VITE_MINIGAMES_API_URL` / `?minigamesApiUrl=` + JWT are configured), **`/game`** runs **`PhaserGame`** / **`MainScene`** (walking bumpkin).
 
 When changing **Phaser visuals**, read **`ART.md`** and keep gameplay art mapped to **`icons.config.ts` / `resources.config.ts`** (`@sl-assets`) where possible — avoid one-off URLs or vector-drawn gameplay tiles where pixel assets exist.
 
@@ -50,7 +50,7 @@ Welcome screen → **Start** → simple Phaser field with a bumpkin moved by arr
 
 | Path | Role |
 |------|------|
-| `/` | Welcome; portal session fetch when `getUrl()` + `getJwt()` succeed |
+| `/` | Welcome; session fetch when `getMinigamesApiUrl()` + `getJwt()` succeed |
 | `/game` | **`MainScene`** inside **`PhaserGame`** |
 
 ---

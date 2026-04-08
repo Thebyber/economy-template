@@ -4,7 +4,10 @@ import { Label } from "components/ui/Label";
 import { Button } from "components/ui/Button";
 import type { PopupRenderProps } from "lib/popups";
 import { assignAppHome } from "lib/assignAppHome";
-import { markHideAndSeekRewardClaimed } from "../lib/hideAndSeekRoundStore";
+import {
+  $hideAndSeekRound,
+  markHideAndSeekRewardClaimed,
+} from "../lib/hideAndSeekRoundStore";
 import { resumeHideAndSeekPhaserPhysics } from "../lib/hideAndSeekSceneRef";
 import {
   markBumpkinHunterGameOverPosting,
@@ -14,7 +17,8 @@ import {
 export const HideAndSeekClaimPopup: React.FC<PopupRenderProps> = ({ onClose }) => {
   useEffect(() => {
     if (!markBumpkinHunterGameOverPosting()) return;
-    void postBumpkinHunterGameOver().catch((err) => {
+    const skullsThisRun = $hideAndSeekRound.get()?.eatProgress ?? 0;
+    void postBumpkinHunterGameOver(skullsThisRun).catch((err) => {
       console.error("Bumpkin Hunter GAMEOVER action failed:", err);
     });
   }, []);

@@ -1,6 +1,5 @@
-import { postPlayerEconomyAction } from "lib/portal/api";
-import { decodePortalToken } from "lib/portal/decodePortalToken";
 import { CONFIG } from "lib/config";
+import { postPlayerEconomyAction } from "lib/portal/api";
 import { getJwt } from "lib/portal/url";
 
 const SESSION_GAMEOVER_KEY = "hideSeek.bumpkinHunter.gameOverActionPosted";
@@ -28,25 +27,30 @@ export function markBumpkinHunterGameOverPosting(): boolean {
 /** Matches minigame editor action id for bumpkin-hunter. */
 export const BUMPKIN_HUNTER_GAMEOVER_ACTION = "GAMEOVER";
 
-/** `mainCurrencyToken` / skull item id from minigame config. */
-export const BUMPKIN_HUNTER_MAIN_ITEM_ID = "0";
+/**
+ * Token key for `amounts` on GAMEOVER (must match `actions.GAMEOVER.mint` in the player economy
+ * for this portal). Override with `VITE_GAMEOVER_MINT_TOKEN_KEY` (e.g. `1` for chicken-rescue-v2).
+ */
+export const gameoverMintTokenKey = (): string => CONFIG.GAMEOVER_MINT_TOKEN_KEY;
+
+/** Align with GAMEOVER mint rule max in portal config (server validates range). */
+const GAMEOVER_MINT_MAX = 50;
 
 /**
  * Notify the portal API that the run ended so the server can apply GAMEOVER mint rules.
- * No-op without JWT + portal id (e.g. local dev).
+ * Pass skulls earned this run (`eatProgress` = correct catches before modal).
+ * No-op without JWT (e.g. local dev). Portal id is taken from the token server-side.
  */
-export async function postBumpkinHunterGameOver(): Promise<void> {
+export async function postBumpkinHunterGameOver(skullAmountThisRun: number): Promise<void> {
   const jwt = getJwt();
   if (!jwt) return;
 
-  const { portalId: fromJwt } = decodePortalToken(jwt);
-  const portalId = fromJwt ?? (CONFIG.PORTAL_APP ?? "").trim();
-  if (!portalId) return;
+  const n = Math.floor(Number(skullAmountThisRun));
+  const clamped = Math.max(0, Math.min(GAMEOVER_MINT_MAX, Number.isFinite(n) ? n : 0));
 
   await postPlayerEconomyAction({
-    portalId,
     token: jwt,
     action: BUMPKIN_HUNTER_GAMEOVER_ACTION,
-    itemId: BUMPKIN_HUNTER_MAIN_ITEM_ID,
+    amounts: { [gameoverMintTokenKey()]: clamped },
   });
 }

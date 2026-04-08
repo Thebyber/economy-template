@@ -2,6 +2,8 @@ import { CONFIG } from "lib/config";
 
 const PORTAL_JWT_STORAGE_KEY = "sunflower_land_portal_jwt";
 const PORTAL_API_ORIGIN_STORAGE_KEY = "sunflower_land_portal_api_origin";
+const PORTAL_MINIGAMES_API_ORIGIN_STORAGE_KEY =
+  "sunflower_land_minigames_api_origin";
 
 function normalizeApiBase(url: string): string {
   return url.replace(/\/$/, "");
@@ -15,6 +17,12 @@ function isAllowedApiHostname(hostname: string): boolean {
     h.endsWith(".sunflower-land.com") ||
     h === "sunflower-land.com"
   );
+}
+
+function isAllowedMinigamesApiHostname(hostname: string): boolean {
+  const h = hostname.toLowerCase();
+  if (isAllowedApiHostname(h)) return true;
+  return /\.execute-api\.[a-z0-9-]+\.amazonaws\.com$/.test(h);
 }
 
 /** Validates `apiUrl` query value; returns normalised origin only (no path). */
@@ -56,8 +64,47 @@ function persistPortalApiOrigin(origin: string) {
   }
 }
 
+/** Validates `minigamesApiUrl` query value; returns normalised origin only (no path). */
+function parseMinigamesApiUrlParam(raw: string): string | undefined {
+  const trimmed = raw.trim();
+  if (!trimmed) return undefined;
+  try {
+    const parsed = new URL(trimmed);
+    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+      return undefined;
+    }
+    if (!isAllowedMinigamesApiHostname(parsed.hostname)) {
+      return undefined;
+    }
+    return normalizeApiBase(parsed.origin);
+  } catch {
+    return undefined;
+  }
+}
+
+function readPersistedMinigamesApiOrigin(): string | undefined {
+  try {
+    const stored = sessionStorage.getItem(PORTAL_MINIGAMES_API_ORIGIN_STORAGE_KEY);
+    if (!stored?.trim()) return undefined;
+    return parseMinigamesApiUrlParam(stored);
+  } catch {
+    return undefined;
+  }
+}
+
+function persistMinigamesApiOrigin(origin: string) {
+  try {
+    sessionStorage.setItem(
+      PORTAL_MINIGAMES_API_ORIGIN_STORAGE_KEY,
+      normalizeApiBase(origin),
+    );
+  } catch {
+    // private mode / quota
+  }
+}
+
 /**
- * Resolves the Sunflower Land API base URL for portal/minigame requests.
+ * Resolves the Sunflower Land **main** API base URL (e.g. portal login, game APIs).
  * 1. `apiUrl` query param (from parent iframe) when valid — persisted in sessionStorage
  *    under `sunflower_land_portal_api_origin`.
  * 2. Previously persisted origin from an earlier load.
@@ -107,6 +154,61 @@ export const getUrl = () => {
     ? normalizeApiBase(CONFIG.API_URL)
     : CONFIG.API_URL;
 };
+
+/**
+ * Minigames API Gateway base URL (GET `/data?type=session`, POST `/action`, `/animate/...`,
+ * `/bumpkins/metadata/...`).
+ *
+ * 1. `minigamesApiUrl` query param when valid — persisted in sessionStorage under
+ *    `sunflower_land_minigames_api_origin`.
+ * 2. Previously persisted origin from an earlier load.
+ * 3. Build-time `CONFIG.MINIGAMES_API_URL` (`VITE_MINIGAMES_API_URL`).
+ */
+export function getMinigamesApiUrl(): string | undefined {
+  const params = new URLSearchParams(window.location.search);
+
+  if (params.has("minigamesApiUrl")) {
+    const raw = params.get("minigamesApiUrl") ?? "";
+    const fromQuery = parseMinigamesApiUrlParam(raw);
+    if (fromQuery) {
+      persistMinigamesApiOrigin(fromQuery);
+      return fromQuery;
+    }
+    if (raw.trim() === "") {
+      try {
+        sessionStorage.removeItem(PORTAL_MINIGAMES_API_ORIGIN_STORAGE_KEY);
+      } catch {
+        // ignore
+      }
+    }
+  }
+
+  const persisted = readPersistedMinigamesApiOrigin();
+  if (persisted) {
+    return persisted;
+  }
+
+  const env = CONFIG.MINIGAMES_API_URL;
+  if (typeof env === "string" && env.trim()) {
+    return normalizeApiBase(env.trim());
+  }
+
+  return undefined;
+}
+
+/**
+ * Base URL for raster bumpkin frames (`/animate/...`).
+ * Prefers `VITE_ANIMATION_URL` (animations CloudFront) over the Minigames API URL.
+ */
+export function getAnimationApiBase(): string | undefined {
+  const anim = CONFIG.ANIMATION_URL;
+  if (typeof anim === "string" && anim.trim()) {
+    return normalizeApiBase(anim.trim());
+  }
+  const minigames = getMinigamesApiUrl();
+  if (minigames) return minigames;
+  return undefined;
+}
 
 /**
  * Portal JWT: read from `?jwt=` when present (and persist to sessionStorage),

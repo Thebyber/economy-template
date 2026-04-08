@@ -31,8 +31,8 @@ export type BootstrapContext = {
   id: number;
   jwt: string;
   /**
-   * Must match `portalId` inside the portal JWT — used for
-   * `GET/POST /portal/:portalId/player-economy`.
+   * Must match `portalId` inside the portal JWT (client-side; Minigames API reads
+   * portal id from the Bearer token for session + actions).
    */
   portalId: string;
   farm: MinigameSessionResponse["farm"];

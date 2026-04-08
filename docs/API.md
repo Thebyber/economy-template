@@ -4,7 +4,7 @@
 
 ## Agent summary
 
-**Portal minigames** use **`src/lib/portal/`** — **`getPlayerEconomySession`** and **`postPlayerEconomyAction`** against `GET/POST …/portal/:portalId/player-economy` (see Chicken Rescue). **Generic profile / trade stubs** live in **`src/lib/api.ts`**: **fake delays**, **TODO** comments, **`coins`**, **`anonymous`**. Replace stubs when you integrate services.
+**Portal minigames** use **`src/lib/portal/`** — **`getPlayerEconomySession`** (`GET {MinigamesApi}/data?type=session`) and **`postPlayerEconomyAction`** (`POST …/action` with `type: "minigame.action"`); portal id comes from the JWT only (same as Chicken Rescue v2). **`GAMEOVER`** / other actions must send **`amounts` keys** that match the economy config for **that** portal (e.g. bumpkin-hunter skull mint is usually token **`"0"`**; chicken-rescue-v2 **`GAMEOVER`** mints chooks on **`"1"`** and burns **`LIVE_GAME`** — set **`VITE_GAMEOVER_MINT_TOKEN_KEY=1`** if you test with a chicken-rescue JWT). **Generic profile / trade stubs** live in **`src/lib/api.ts`**: **fake delays**, **TODO** comments, **`coins`**, **`anonymous`**. Replace stubs when you integrate services.
 
 ## Current contract (template)
 

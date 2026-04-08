@@ -17,9 +17,13 @@ export const WelcomePage: React.FC = () => {
 
       {status === "no_api" && (
         <p className="text-sm text-center max-w-md opacity-90">
-          No API base URL. Set <code className="text-amber-200/90">VITE_API_URL</code>,{" "}
-          open with <code className="text-amber-200/90">?network=</code>, or pass{" "}
-          <code className="text-amber-200/90">?apiUrl=https://api-dev.sunflower-land.com</code>.
+          No Minigames API URL for session/actions. Set{" "}
+          <code className="text-amber-200/90">VITE_MINIGAMES_API_URL</code> (SST{" "}
+          <code className="text-amber-200/90">MinigamesApi</code> URL), or pass{" "}
+          <code className="text-amber-200/90">?minigamesApiUrl=https://…</code> from the parent
+          iframe. Main game API (<code className="text-amber-200/90">VITE_API_URL</code> /{" "}
+          <code className="text-amber-200/90">?apiUrl=</code>) is separate — used for portal login
+          and other calls.
         </p>
       )}
 

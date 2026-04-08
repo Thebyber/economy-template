@@ -23,7 +23,7 @@
 | Audio | `howler`, `src/lib/audio.ts`, `src/config/audio.config.ts` |
 | Icons | URL config only, `src/config/icons.config.ts`, `src/components/ui/Icon.tsx` |
 | Backend (stub) | `src/lib/api.ts` |
-| Portal / player economy | `src/lib/portal/` (`getPlayerEconomySession`, `postPlayerEconomyAction`) |
+| Portal / player economy | `src/lib/portal/` (`getPlayerEconomySession`, `postPlayerEconomyAction`, `getMinigamesApiUrl`) |
 
 ## Phaser × React boundaries
 
@@ -71,7 +71,7 @@
 
 ### Default sample: Boring (`src/examples/boring/`)
 
-- **`/`** — `BoringSessionContext` calls **`getPlayerEconomySession`** when API base URL + portal JWT are available.
+- **`/`** — `BoringSessionContext` calls **`getPlayerEconomySession`** when Minigames API URL + portal JWT are available (`VITE_MINIGAMES_API_URL` or `?minigamesApiUrl=`).
 - **`/game`** — **`PhaserGame`** + **`MainScene`**; bumpkin uses bundled silhouette assets under `public/game/`.
 
 ## Agent checklist (before editing)
