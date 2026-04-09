@@ -10,9 +10,8 @@ Player minigames talk to Sunflower Land’s **public economies API**. In product
 
 **`https://economies-api.sunflower-land.com`**
 
-(Other environments may use a different host; your client should use the base URL you were given.)
 
-That API is **intentionally limited**: it lets an authenticated **player** (via their **portal JWT**) **fetch** data for **your** published economy (session snapshot, rules, balances, jobs) and **perform a small set of operations**—the **session** load and the **action** posts described below. It is not a full admin or editor API; it only exposes what players need inside the iframe.
+That API is **intentionally limited**: it lets an authenticated **player** (via their **JWT**) **fetch** data for **your** published economy (session snapshot, rules, balances, jobs) and **perform a small set of operations**—the **session** load and the **action** posts described below. It is not a full admin or editor API; it only exposes what players need inside the iframe.
 
 **You must send the JWT on every request** to that host, as a Bearer token:
 
@@ -25,14 +24,14 @@ Without a valid token, the API will not return farm-specific economy state or ac
 ## How your app loads
 
 1. Sunflower Land opens your game inside an **iframe** (your published minigame URL).
-2. The parent passes the **portal JWT** on the query string, typically **`?jwt=…`**. Read this on startup; it is the same token you pass to **`https://economies-api.sunflower-land.com`** (or your configured base URL) as **`Authorization: Bearer …`**.
-3. On first paint (or before gameplay), call **session** (below) so you have **rules** (`actions`, `items`, …) and **this farm’s state** (`playerEconomy`: balances, active generator jobs, daily counters, …).
+2. The parent passes the **portal JWT** on the query string in the URL of your game, typically **`?jwt=…`**. Read this on startup; it is the same token you pass to **`https://economies-api.sunflower-land.com`** (or your configured base URL) as **`Authorization: Bearer …`**.
+3. On first paint (or before gameplay), call **session** (below) so you have **rules** (`actions`, `items`, …) and **this farm’s state** (`playerEconomy`: balances, items, …).
 
 If the token is missing or expired, show your own “session expired” or “open from the game” message.
 
 ---
 
-## The three economies API calls
+## The main economies API calls
 
 All requests use the **same base URL** (e.g. `https://economies-api.sunflower-land.com`) and the **same JWT** in the `Authorization` header. Paths below are relative to that base.
 
@@ -43,9 +42,42 @@ All requests use the **same base URL** (e.g. `https://economies-api.sunflower-la
 | **Use when** | App boot, or after you need a full refresh of config and balances. |
 | **Request** | `GET /data?type=session` |
 | **Headers** | `Authorization: Bearer <jwt>`, `Accept: application/json` |
-| **Returns** | A payload that includes your published **`actions`** and **`items`**, plus **`playerEconomy`** (e.g. `balances`, `generating` for in‑progress jobs). |
+| **Returns** | A payload that includes your published **`actions`** and **`items`**, plus **`playerEconomy`** (e.g. `balances`, `generating` for in‑progress jobs, optional **`highscore`**). |
 
 Use this to render HUDs, shops, timers, and to know which **action ids** exist before you POST anything.
+
+**Example shape** (illustrative; field names match the live API — `jsonc` allows `//` comments):
+
+```jsonc
+{
+  "farm": {
+    "balance": "1250", // Bumpkin’s main-game currency as a string (not economy tokens)
+    "bumpkin": {} // Avatar / wearables snapshot from the parent game (shape varies)
+  },
+  "playerEconomy": {
+    "balances": { "energy": 5, "lives": 3 }, // Your economy token keys → counts
+    "generating": {
+      // Job id → timer; collect with POST generator.collected + itemId when completesAt <= now
+      "a1b2c3d4": {
+        "outputToken": "Timber",
+        "startedAt": 1710000000000,
+        "completesAt": 1710000005000
+      }
+    },
+    "activity": 42, // Lifetime successful economy actions (named + generator collects)
+    "dailyActivity": { "date": "2026-04-10", "count": 3 }, // UTC-day action count
+    "dailyMinted": {
+      "utcDay": "2026-04-10",
+      "minted": { "RUN|Coin": 120 } // Per-action/token daily mint totals (keys vary)
+    },
+    "highscore": 9876 // Present after at least one score.submitted; best score for this farm
+  },
+  "actions": {}, // Published rules keyed by action id (same ids you POST as "action")
+  "items": {}, // Token metadata: names, images, marketplace ids, …
+  "playUrl": "https://your-portal.minigames.sunflower-land.com", // Canonical play origin for this economy
+  "mainCurrencyToken": "energy" // Optional HUD hint for primary token key
+}
+```
 
 ---
 
@@ -75,6 +107,19 @@ The string **`action`** must match the **id** of a published action. The server 
 
 ---
 
+### 4. Action — `score.submitted` (persist a run score / highscore)
+
+| | |
+|---|---|
+| **Use when** | The player finishes a run (or level) and you want a **single persisted best score** for this farm in this economy — not a balance token. |
+| **Request** | `POST /action` |
+| **Body** | `{ "type": "minigame.action", "action": "score.submitted", "score": <non-negative integer> }` |
+| **Headers** | Same as above |
+
+**`score.submitted`** is a **reserved** action name: you do **not** define it in the economy editor. The server stores **`playerEconomy.highscore`** if this is the first submit, or **replaces** it only when **`score`** is **strictly greater** than the saved value. Use **`minigame.action`** with other ids for mint/burn rules; use this dedicated POST for leaderboard-style scores.
+
+---
+
 ## Example: one action in the editor and how to call it
 
 Suppose the economy defines an action id **`START_RUN`** that should cost one **energy** token and grant three **lives**. In the editor, that rule is stored as JSON-shaped fields on that action, conceptually like:
@@ -94,8 +139,8 @@ Suppose the economy defines an action id **`START_RUN`** that should cost one **
 
 | Field | Role |
 |--------|------|
-| **`burn`** | Tokens **removed** from the player if they have enough. Can be a fixed `amount` or a min/max range; ranges need a matching entry in the POST **`amounts`** object. |
-| **`mint`** | Tokens **added**. Same idea: fixed amount in the rule, or a range with **`amounts`** in the request. |
+| **`burn`** | Tokens **removed** from the player if they have enough. Can be a fixed `amount` or a min/max range; ranged rules require a matching key in the POST **`amounts`** object. |
+| **`mint`** | Tokens **added**. Fixed `amount` in the rule, or a range with **`amounts`** in the request for ranged rules. |
 | **`require`** | Player must **already have** at least N of a token (a gate; not the same as burning). |
 | **`requireBelow` / `requireAbsent`** | Extra gates (caps, “don’t already own”, etc.) depending on your rule. |
 | **`produce` / `collect`** | Start a **timed job** and define what **collecting** that job grants. Start = `minigame.action`; finish = **`generator.collected`** with the job’s id. |
@@ -113,19 +158,17 @@ Content-Type: application/json
 }
 ```
 
-**Example with ranged mint** (e.g. action **`GAMEOVER`** mints token **`"score"`** between 0 and 100 based on gameplay):
+**Example: submitting a run score** (server updates **`playerEconomy.highscore`** when the value improves):
 
 ```json
 {
   "type": "minigame.action",
-  "action": "GAMEOVER",
-  "amounts": {
-    "score": 73
-  }
+  "action": "score.submitted",
+  "score": 12450
 }
 ```
 
-Keys inside **`amounts`** must match the **token keys** used in your **mint** / **burn** ranged rules. The server checks the number is within the configured min/max.
+For **ranged mint/burn** rules you still send **`amounts`** with **`minigame.action`** and a normal editor action id; keys must match the token keys in the rule, and values must sit inside the configured min/max.
 
 **Successful responses** include an updated view of the economy / `playerEconomy` (exact shape depends on the service). Prefer that **authoritative** state over guessing deltas on the client.
 
@@ -145,8 +188,9 @@ Keys inside **`amounts`** must match the **token keys** used in your **mint** / 
 ## Mental model
 
 - **Session** — One read that gives you **config + current player state**. Refresh after big changes if you want a simple mental model.
-- **Named actions** — **`minigame.action`** runs **one** published rule by id (with optional **`amounts`**).
+- **Named actions** — **`minigame.action`** runs **one** published rule by id (with optional **`amounts`** for ranged mint/burn).
 - **Generator harvest** — **`generator.collected`** completes **one** running job by **`itemId`** (job key in `generating`).
+- **Highscore** — **`score.submitted`** updates **`playerEconomy.highscore`** when the posted score beats the stored best (reserved action id, not in the editor).
 
 You should not invent balance changes only in the client if you care about persistence: the server enforces what you published. You can still **predict** updates for snappy UI, then reconcile with the response.
 
@@ -173,6 +217,7 @@ Think in **token keys** (strings, often `"0"`, `"1"`, …) and **actions** (name
 
 ## Gotchas
 
+- **`score.submitted`** requires a non‑negative integer **`score`**; do not send **`amounts`** on that action.
 - **`amounts`** keys must match **mint/burn** token keys in the published rule.
 - **Portal id in the JWT** must match the economy **slug** you saved in the editor.
 - After any **`POST /action`**, use the returned **player economy / balances** from the server when possible (chance-based collects, daily caps, and purchase limits are easy to get wrong if you only guess on the client).

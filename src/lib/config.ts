@@ -44,6 +44,9 @@ const GAMEOVER_MINT_TOKEN_KEY = (
   import.meta.env.VITE_GAMEOVER_MINT_TOKEN_KEY as string | undefined
 )?.trim();
 
+/** Production Colyseus endpoint (fixed; not configurable via env). */
+const MMO_PRODUCTION_ROOM_URL = "wss://mmo.sunflower-land.com";
+
 export const CONFIG = {
   API_URL,
   PORTAL_APP,
@@ -59,4 +62,6 @@ export const CONFIG = {
   PORTAL_CR_ACTION_GAME_OVER_ADVANCED,
   /** Default `"0"` when env unset; set to `1` when testing with chicken-rescue-v2 JWT. */
   GAMEOVER_MINT_TOKEN_KEY: GAMEOVER_MINT_TOKEN_KEY || "0",
+  /** Sunflower Land production MMO (`wss://mmo.sunflower-land.com`). */
+  MMO_PRODUCTION_ROOM_URL,
 };

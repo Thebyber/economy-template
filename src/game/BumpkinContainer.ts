@@ -84,7 +84,16 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
       frameHeight: 64,
     });
 
+    const onBumpkinLoadError = (file: Phaser.Loader.File) => {
+      if (file.key !== this.spriteKey) return;
+      scene.load.off(Phaser.Loader.Events.FILE_LOAD_ERROR, onBumpkinLoadError);
+      if (this.ready || !this.silhouette?.active) return;
+      this.silhouette.setScale(4, 4);
+    };
+    scene.load.on(Phaser.Loader.Events.FILE_LOAD_ERROR, onBumpkinLoadError);
+
     scene.load.once(`filecomplete-spritesheet-${this.spriteKey}`, () => {
+      scene.load.off(Phaser.Loader.Events.FILE_LOAD_ERROR, onBumpkinLoadError);
       if (!scene.textures.exists(this.spriteKey) || this.ready) return;
       this.ensureAnims(scene);
       this.swapToAnimatedSprite(scene);
