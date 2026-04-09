@@ -1,12 +1,14 @@
 import React, { useEffect, useRef } from "react";
 import Phaser from "phaser";
 import { useStore } from "@nanostores/react";
-import { $gameState } from "lib/gameStore";
+import { $gameState, patchGameState } from "lib/gameStore";
+import { useMinigameSession } from "lib/portal";
 import { popupSingleton } from "lib/popupSingleton";
 import { Label } from "components/ui/Label";
 import { HideAndSeekScene } from "./game/HideAndSeekScene";
 import { HideAndSeekNextTargetHud } from "./components/HideAndSeekNextTargetHud";
-import { prepareHideAndSeekRound } from "./lib/hideAndSeekRoundStore";
+import { prepareHideAndSeekRoundFromSession } from "./lib/hideAndSeekRoundStore";
+import { gameoverMintTokenKey } from "./lib/bumpkinHunterPortal";
 
 function fallbackHalfViewport() {
   return {
@@ -19,14 +21,22 @@ export const HideAndSeekGamePage: React.FC = () => {
   const hostRef = useRef<HTMLDivElement>(null);
   const skulls = useStore($gameState).skulls;
   const skullIconSrc = `${import.meta.env.BASE_URL}game/skull.png`;
+  const { playerEconomy, economyMeta } = useMinigameSession();
 
   useEffect(() => {
-    const round = prepareHideAndSeekRound();
+    const mintKey = gameoverMintTokenKey();
+    const bal = playerEconomy.balances[mintKey];
+    if (typeof bal === "number" && Number.isFinite(bal)) {
+      patchGameState({ skulls: Math.max(0, Math.floor(bal)) });
+    }
+
+    const round = prepareHideAndSeekRoundFromSession(economyMeta?.dashboard);
     const first = round.eatOrder[0];
     popupSingleton.open("hideAndSeekWelcome", {
       tokenParts: first?.tokenParts ?? "",
       npcName: first?.npcName ?? "",
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- bootstrap once from initial session snapshot
   }, []);
 
   useEffect(() => {

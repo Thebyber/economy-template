@@ -2,6 +2,7 @@ import { atom } from "nanostores";
 import { NPC_WEARABLES, type NPCName } from "lib/npcs";
 import { tokenUriBuilder, type BumpkinParts } from "lib/utils/tokenUriBuilder";
 import { clearBumpkinHunterGameOverSessionFlag } from "./bumpkinHunterPortal";
+import type { MinigameSessionEconomyMeta } from "lib/portal/types";
 
 /** Bumpkins on screen per round; eat order is a permutation of this set. */
 export const HIDE_AND_SEEK_BUMPKIN_COUNT = 30;
@@ -107,6 +108,77 @@ export function prepareHideAndSeekRound(): HideAndSeekRound {
   };
   $hideAndSeekRound.set(round);
   return round;
+}
+
+function tokenSet(
+  rows: readonly { tokenParts: string }[],
+): Set<string> | null {
+  const s = new Set<string>();
+  for (const r of rows) {
+    const t = typeof r.tokenParts === "string" ? r.tokenParts.trim() : "";
+    if (!t) return null;
+    if (s.has(t)) return null;
+    s.add(t);
+  }
+  return s;
+}
+
+function isValidApiRoundPayload(
+  raw: unknown,
+): raw is {
+  eatOrder: HideAndSeekNpcSpawn[];
+  npcSpawnList: HideAndSeekNpcSpawn[];
+} {
+  if (!raw || typeof raw !== "object") return false;
+  const eatOrder = (raw as { eatOrder?: unknown }).eatOrder;
+  const npcSpawnList = (raw as { npcSpawnList?: unknown }).npcSpawnList;
+  if (!Array.isArray(eatOrder) || !Array.isArray(npcSpawnList)) return false;
+  if (
+    eatOrder.length !== HIDE_AND_SEEK_BUMPKIN_COUNT ||
+    npcSpawnList.length !== HIDE_AND_SEEK_BUMPKIN_COUNT
+  ) {
+    return false;
+  }
+  const rows = [...eatOrder, ...npcSpawnList] as {
+    npcName?: unknown;
+    tokenParts?: unknown;
+  }[];
+  for (const row of rows) {
+    if (typeof row.npcName !== "string" || typeof row.tokenParts !== "string") {
+      return false;
+    }
+  }
+  const eatTokens = tokenSet(eatOrder as HideAndSeekNpcSpawn[]);
+  const spawnTokens = tokenSet(npcSpawnList as HideAndSeekNpcSpawn[]);
+  if (!eatTokens || !spawnTokens || eatTokens.size !== spawnTokens.size) {
+    return false;
+  }
+  for (const t of eatTokens) {
+    if (!spawnTokens.has(t)) return false;
+  }
+  return true;
+}
+
+/**
+ * After Minigames session load: use `dashboard.hideAndSeekRound` when valid,
+ * otherwise same as {@link prepareHideAndSeekRound}.
+ */
+export function prepareHideAndSeekRoundFromSession(
+  dashboard: MinigameSessionEconomyMeta["dashboard"] | undefined,
+): HideAndSeekRound {
+  const fromApi = dashboard?.hideAndSeekRound;
+  if (fromApi && isValidApiRoundPayload(fromApi)) {
+    clearBumpkinHunterGameOverSessionFlag();
+    const round: HideAndSeekRound = {
+      eatOrder: fromApi.eatOrder,
+      npcSpawnList: fromApi.npcSpawnList,
+      eatProgress: 0,
+      rewardClaimed: false,
+    };
+    $hideAndSeekRound.set(round);
+    return round;
+  }
+  return prepareHideAndSeekRound();
 }
 
 export function markHideAndSeekRewardClaimed(): void {

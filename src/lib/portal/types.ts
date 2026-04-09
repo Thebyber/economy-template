@@ -15,6 +15,14 @@ export type MinigameSessionEconomyMeta = {
   dashboard?: {
     productionCollectByStartId?: Record<string, string>;
     visualTheme?: string;
+    /**
+     * Optional server-defined Hide & Seek round (same shape as client).
+     * When omitted, the game generates a random round locally.
+     */
+    hideAndSeekRound?: {
+      eatOrder: Array<{ npcName: string; tokenParts: string }>;
+      npcSpawnList: Array<{ npcName: string; tokenParts: string }>;
+    };
   };
 };
 
