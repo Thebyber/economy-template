@@ -239,8 +239,8 @@ export class DeepDungeonScene extends BaseScene {
       this._stats = {
         energy: reg?.energy ?? 100,
         maxEnergy: reg?.energy ?? 100,
-        attack: reg?.attack ?? 5,
-        defense: reg?.defense ?? 2,
+        attack: reg?.attack ?? 1,
+        defense: reg?.defense ?? 1,
         criticalChance: reg?.criticalChance ?? 5,
         inventory: { pickaxe: reg?.startingPickaxes ?? 1 },
         currentLevel: this.currentLevel,

@@ -130,8 +130,8 @@ export interface DeepDungeonPlayerStats {
 
 const BASE_STATS: DeepDungeonPlayerStats = {
   energy: 100,
-  attack: 5,
-  defense: 2,
+  attack: 1,
+  defense: 1,
   criticalChance: 5,
   startingPickaxes: 1,
 };
