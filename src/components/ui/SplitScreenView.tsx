@@ -3,7 +3,7 @@ import classNames from "classnames";
 import { InnerPanel } from "components/ui/Panel";
 
 interface Props {
-  divRef?: React.RefObject<HTMLDivElement | null>;
+  divRef?: React.Ref<HTMLDivElement>;
   tallMobileContent?: boolean;
   tallDesktopContent?: boolean;
   wideModal?: boolean;

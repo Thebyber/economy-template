@@ -18,7 +18,7 @@ export interface PanelProps extends React.HTMLAttributes<HTMLDivElement> {
 export const InnerPanel: React.FC<
   React.PropsWithChildren<
     React.HTMLAttributes<HTMLDivElement> & {
-      divRef?: React.RefObject<HTMLDivElement | null>;
+      divRef?: React.Ref<HTMLDivElement>;
     }
   >
 > = ({ children, ...divProps }) => {

@@ -2,7 +2,7 @@ import React from "react";
 import classNames from "classnames";
 import { PIXEL_SCALE } from "lib/constants";
 import { ButtonPanel } from "components/ui/Panel";
-import { SUNNYSIDE } from "example-assets/sunnyside";
+import { SUNNYSIDE } from "../../../assets/ui/sunnyside";
 import type { MinigameShopItemUi } from "../lib/minigameDashboardTypes";
 import { getMinigameTokenImage } from "../lib/minigameTokenIcons";
 import Decimal from "decimal.js-light";

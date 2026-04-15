@@ -1,4 +1,4 @@
-import { SUNNYSIDE } from "example-assets/sunnyside";
+import { SUNNYSIDE } from "../../../assets/ui/sunnyside";
 import { resolveMinigameCdnImageUrl } from "./resolveMinigameCdnImageUrl";
 
 /** When `items[token].image` is missing or unusable (e.g. load error). */

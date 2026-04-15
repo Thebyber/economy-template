@@ -3,7 +3,7 @@ import Decimal from "decimal.js-light";
 import { PIXEL_SCALE } from "lib/constants";
 import { Box } from "components/ui/Box";
 import { RoundButton } from "components/ui/RoundButton";
-import { SUNNYSIDE } from "example-assets/sunnyside";
+import { SUNNYSIDE } from "../../../assets/ui/sunnyside";
 import classNames from "classnames";
 import { useSound } from "lib/utils/hooks/useSound";
 import type { MinigameInventoryItemUi } from "../lib/minigameDashboardTypes";

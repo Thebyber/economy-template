@@ -17,7 +17,7 @@ export const Box: React.FC<{
   className?: string;
   onClick?: () => void;
   isSelected?: boolean;
-  parentDivRef?: React.RefObject<HTMLDivElement | null>;
+  parentDivRef?: React.Ref<HTMLDivElement>;
 }> = ({
   image,
   count,

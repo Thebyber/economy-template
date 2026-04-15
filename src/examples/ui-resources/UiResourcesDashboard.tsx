@@ -9,7 +9,7 @@ import Decimal from "decimal.js-light";
 import { Button } from "components/ui/Button";
 import { InnerPanel } from "components/ui/Panel";
 import { PIXEL_SCALE } from "lib/constants";
-import { SUNNYSIDE } from "example-assets/sunnyside";
+import { SUNNYSIDE } from "../../assets/ui/sunnyside";
 import { useAppTranslation } from "lib/i18n/useAppTranslations";
 import {
   mergeMinigameEconomyFromApi,
