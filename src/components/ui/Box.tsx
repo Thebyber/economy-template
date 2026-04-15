@@ -13,6 +13,7 @@ export const Box: React.FC<{
   count?: Decimal;
   showCountIfZero?: boolean;
   hideCount?: boolean;
+  fillImage?: boolean;
   className?: string;
   onClick?: () => void;
   isSelected?: boolean;
@@ -22,6 +23,7 @@ export const Box: React.FC<{
   count,
   showCountIfZero,
   hideCount,
+  fillImage,
   className,
   onClick,
   isSelected,
@@ -66,7 +68,7 @@ export const Box: React.FC<{
         <img
           src={image}
           alt=""
-          className="max-w-[85%] max-h-[85%] object-contain"
+          className={fillImage ? "w-[85%] h-[85%] object-contain" : "max-w-[85%] max-h-[85%] object-contain"}
           draggable={false}
           style={{ imageRendering: "pixelated" }}
         />

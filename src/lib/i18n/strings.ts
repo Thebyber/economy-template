@@ -83,6 +83,48 @@ export const EN_STRINGS: Record<string, string> = {
   "minigame.dashboard.production.whatToProduce": "What do you want to produce?",
   "minigame.dashboard.production.mysteryDropTitle": "Mystery drop",
   "minigame.dashboard.production.tapToCollect": "Tap to collect",
+
+  // ── Deep Dungeon ────────────────────────────────────────────────────────────
+  "deepdungeon.guide": "Dungeon Guide",
+  "deepdungeon.instructions": "Instructions",
+  "deepdungeon.enemies": "Enemies",
+  "deepdungeon.stats": "Stats",
+  "deepdungeon.points": "Points",
+  "deepdungeon.guideDescription": "{{description}}",
+
+    
+  "deepdungeon.instructions1": "Explore the Deep Dungeon, but watch your energy!",
+  "deepdungeon.instructions2": "You start with 100 energy, and every move will cost you 1 energy.",
+  "deepdungeon.instructions3": "Earn points by defeating enemies, clearing dungeon floors, or mining crystals (Pickaxe required).",
+  "deepdungeon.instructions4": "Defeating enemies grants random drops, such as Pickaxes or combat stat boosts.",
+  "deepdungeon.instructions5": "Mine crystals to recover energy and survive longer in the depths. You can find 3 pickaxes on each map",
+  "deepdungeon.instructions6": "When moving to the next map via the staircase, you win 15 energy and you can choose 1 power-up from 3 random cards.",
+  
+  "deepdungeon.stats1": "Energy is the player's life. If your energy drops to 0, you will lose the run and all progress made in that run.",
+  "deepdungeon.stats2": "Life of the enemy.",
+  "deepdungeon.stats3": "Attack of the enemy/player.",
+  "deepdungeon.stats4": "Area of Effect of the enemy's attack. If you get close to an enemy with an AoE attack.",
+  "deepdungeon.stats5": "Defense of the enemy/player. This reduces the damage taken from attacks.",
+  "deepdungeon.stats6": "Critical hit chance of the enemy/player. This is the chance to deal a critical hit. If you're lucky, the final damage is multiplied by 2.",
+  "deepdungeon.stats7": "Damage formula => Life = Attack - Defense ",
+  "deepdungeon.stats8": "Critical hit => Life = (Attack * 2) - Defense",
+  
+  "deepdungeon.enemies1": "Slime: A basic enemy very gelatinous.",
+  "deepdungeon.enemies2": "Skeleton: A basic enemy that can be defeated with a few hits.",
+  "deepdungeon.enemies3": "Knight: A stronger enemy that requires more hits to defeat.",
+  "deepdungeon.enemies4": "Frankenstein: A powerful enemy that can deal heavy damage. If you get close, it will perform an area-of-effect lightning attack.",
+  "deepdungeon.enemies5": "Devil: The strongest enemy in the dungeon, capable of dealing significant damage. If you get close, it will attack you with a burst of fire.",
+  
+  "deepdungeon.points1": "Pink Crystal: Tier 1 grants 100 points, increasing by 100 points per tier, up to 500 points at Tier 5.",
+  "deepdungeon.points2": "White Crystal: Tier 1 grants 150 points, increasing by 150 points per tier, up to 750 points at Tier 5.",
+  "deepdungeon.points3": "Blue Crystal: Tier 1 grants 200 points, increasing by 200 points per tier, up to 1000 points at Tier 5.",
+  "deepdungeon.points4": "Prismora Crystal: Tier 1 grants 250 points, increasing by 250 points per tier, up to 1250 points at Tier 5.",
+  "deepdungeon.points5": "Slime: Defeating it grants 100 points.",
+  "deepdungeon.points6": "Skeleton: Defeating it grants 200 points.",
+  "deepdungeon.points7": "Knight: Defeating it grants 400 points.",
+  "deepdungeon.points8": "Frankenstein: Defeating it grants 600 points.",
+  "deepdungeon.points9": "Devil: Defeating it grants 1000 points.",
+  "deepdungeon.points10": "Advancing to the next map grants 50 points, if you reach map 5 you will earn 250 points",
 };
 
 function interpolate(

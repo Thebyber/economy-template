@@ -11,7 +11,12 @@ module.exports = {
           400: "#966953",
           600: "#b96f50",
           700: "#945542",
+          800: "#6b3a2a",
+          900: "#3e2210",
         },
+      },
+      fontFamily: {
+        pixel: ["'Silkscreen'", "monospace"],
       },
     },
   },

@@ -1,0 +1,76 @@
+import { BumpkinContainer } from "features/world/containers/BumpkinContainer";
+import { DeepDungeonScene } from "../DeepDungeonScene"; // Ajusta a tu escena
+
+interface Props {
+  x: number;
+  y: number;
+  scene: DeepDungeonScene;
+  player: BumpkinContainer;
+}
+
+export class PickaxeContainer extends Phaser.GameObjects.Container {
+  private player: BumpkinContainer;
+  private sprite: Phaser.GameObjects.Sprite;
+  public scene: DeepDungeonScene;
+  private isCollected: boolean = false;
+
+  constructor({ x, y, scene, player }: Props) {
+    super(scene, x, y);
+    this.scene = scene;
+    this.player = player;
+
+    // 1. Sprite del pico (centrado en el container)
+    this.sprite = scene.add.sprite(0, 0, "pickaxe_sprite").setOrigin(0.5);
+    this.add(this.sprite);
+
+    // 2. Física
+    scene.physics.add.existing(this);
+    const body = this.body as Phaser.Physics.Arcade.Body;
+
+    body
+      .setSize(16, 16) // Tamaño de colisión
+      .setImmovable(true);
+    body.setOffset(-8, -8);
+    // 3. Animación de "levitación" para que se vea recolectable
+    scene.tweens.add({
+      targets: this.sprite,
+      y: -4,
+      duration: 1000,
+      yoyo: true,
+      repeat: -1,
+      ease: "Sine.easeInOut",
+    });
+
+    // 4. Configurar el Overlap
+    this.createOverlaps();
+
+    // 5. Añadir a la escena
+    scene.add.existing(this);
+    this.setDepth(y);
+  }
+
+  private createOverlaps() {
+    this.scene.physics.add.overlap(this.player, this, () => this.collect());
+  }
+
+  private collect() {
+    const playUISound = (fileName: string) => {
+      const audio = new Audio(`/world/DeepDungeonAssets/${fileName}.mp3`);
+      audio.volume = 0.4;
+      audio.play().catch(() => {});
+    };
+    if (this.isCollected) return;
+    this.isCollected = true;
+    playUISound("win_item");
+    // 1. Notificar a la escena
+    this.scene.addPickaxe();
+
+    // 2. MOSTRAR EL TEXTO FLOTANTE
+    // Usamos las coordenadas actuales (this.x, this.y) del container
+    // El label puede ser "+1 Pickaxe" o el que prefieras
+    this.scene.spawnFloatingText(this.x, this.y, "+1 Pickaxe");
+
+    // 3. Destruir el objeto
+    this.destroy();
+  }
+}

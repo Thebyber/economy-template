@@ -113,7 +113,7 @@ export const Label: React.FC<React.PropsWithChildren<Props>> = ({
           src={icon}
           alt=""
           className="shrink-0"
-          style={{ width: 14, height: 14, imageRendering: "pixelated" }}
+          style={{ width: 20, height: 20, imageRendering: "pixelated" }}
         />
       )}
       {children}

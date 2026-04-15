@@ -3,7 +3,7 @@
     <info face="8-bit fortress" size="7"/>
     <common lineHeight="10" base="2"/>
     <pages>
-        <page id="0" file="7px.png"/>
+        <page id="0" file="8-bit fortress7.png"/>
     </pages>
     <chars>
         <char id="32" x="0" y="0" width="2" height="9" xoffset="0" yoffset="0" xadvance="2" page="0"/>

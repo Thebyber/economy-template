@@ -201,9 +201,12 @@ export const ANIMATIONS_CDN_ORIGIN = "https://animations.sunflower-land.com";
 
 /**
  * Base URL for raster bumpkin frames (`/animate/...`, `animated_webp/...`).
- * Always `animations.sunflower-land.com` (separate from Minigames API).
+ * Reads `VITE_ANIMATION_URL` from env when set (e.g. dev server), falls back
+ * to `animations.sunflower-land.com`.
  */
 export function getAnimationApiBase(): string {
+  const envUrl = CONFIG.ANIMATION_URL;
+  if (envUrl) return normalizeApiBase(envUrl);
   return normalizeApiBase(ANIMATIONS_CDN_ORIGIN);
 }
 
