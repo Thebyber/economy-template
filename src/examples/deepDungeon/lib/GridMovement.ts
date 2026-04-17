@@ -152,11 +152,10 @@ export class GridMovement {
     );
 
     if (targetCrystal) {
-      // Llamamos a la lógica de minado de la escena
-      // (Debemos castear a la escena real para que TS reconozca handleMining)
-      scene.handleMining(targetCrystal);
+      if (dx < 0) this.currentPlayer.faceLeft();
+      else if (dx > 0) this.currentPlayer.faceRight();
 
-      // BLOQUEAMOS EL MOVIMIENTO: No dejamos que haga el tween
+      scene.handleMining(targetCrystal);
       return;
     }
     // 4. COMPROBAR ENEMIGOS Y ATACAR
@@ -175,6 +174,9 @@ export class GridMovement {
       if (player.isAttacking || player.isHurting || this.attackCooldown) {
         return;
       }
+
+      if (dx < 0) player.faceLeft();
+      else if (dx > 0) player.faceRight();
 
       this.attackCooldown = true;
       player.attack();

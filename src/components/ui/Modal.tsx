@@ -12,7 +12,7 @@ export const Modal: React.FC<{
   return (
     <div
       className={classNames(
-        "fixed inset-0 z-[100] flex items-center justify-center bg-black/40 p-2",
+        "fixed inset-0 z-[100] flex items-center justify-center bg-black/40 p-2 pointer-events-auto",
         className,
       )}
       role="dialog"

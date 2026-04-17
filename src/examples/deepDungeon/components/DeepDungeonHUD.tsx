@@ -9,7 +9,7 @@ import { EnergyStats } from "./EnergyStats";
 import { DungeonProgress } from "./DungeonProgress";
 import { DungeonDrops } from "./DungeonDrops";
 import { DungeonInventory } from "./DungeonInventory";
-import { INSTRUCTIONS, POINTS, ENEMIES_GUIDE, STATS_GUIDE } from "../DeepDungeonConstants";
+import { MOVE_GUIDE ,INSTRUCTIONS, POINTS, ENEMIES_GUIDE, STATS_GUIDE } from "../DeepDungeonConstants";
 import type { DeepDungeonRunStats } from "../DeepDungeonScene";
 import type { RunProgress } from "../lib/DeepDungeonRunContext";
 import Decimal from "decimal.js-light";
@@ -38,8 +38,9 @@ const GuideSection: React.FC<{
   </div>
 );
 
-const DungeonGuide: React.FC = () => (
-  <div className="flex flex-col gap-1 overflow-y-auto scrollable pr-1 p-2 font-bold">
+export const DungeonGuide: React.FC = () => (
+  <div className="flex flex-col gap-1 pr-1 p-2 font-bold">
+    <GuideSection title="Move" items={MOVE_GUIDE} />
     <GuideSection title="Instructions" items={INSTRUCTIONS} />
     <GuideSection title="Enemies" items={ENEMIES_GUIDE} />
     <GuideSection title="Stats" items={STATS_GUIDE} />
@@ -124,7 +125,7 @@ export const DeepDungeonHUD: React.FC<Props> = ({
 
       {/* ── INVENTORY MODAL ── */}
       <Modal show={showInventory}>
-        <OuterPanel className="flex flex-col h-[500px] w-full p-1">
+        <OuterPanel className="flex flex-col h-[500px] max-h-[80vh] w-full max-w-lg p-1">
           <div className="flex items-center pl-1 mb-2">
             <div className="flex items-center grow">
               <img src={DD_SUNNYSIDE.icons.basket} className="h-6 mr-3 ml-1" alt="" />
@@ -146,7 +147,7 @@ export const DeepDungeonHUD: React.FC<Props> = ({
 
       {/* ── CODEX MODAL ── */}
       <Modal show={showCodex}>
-        <OuterPanel className="flex flex-col h-[500px] w-full p-1">
+        <OuterPanel className="flex flex-col h-[500px] max-h-[80vh] w-full max-w-lg p-1">
           <div className="flex items-center pl-1 mb-2">
             <div className="flex items-center grow">
               <img src={DD_SUNNYSIDE.icons.search} className="h-6 mr-3 ml-1" alt="" />
@@ -161,7 +162,7 @@ export const DeepDungeonHUD: React.FC<Props> = ({
             />
           </div>
 
-          <div className="flex flex-row h-full overflow-hidden">
+          <div className="flex flex-row flex-1 overflow-hidden">
             {/* Tab sidebar */}
             <div className="flex flex-col gap-1 pr-1 ml-0.5">
               <TabButton active={activeTab === "Enemies"} onClick={() => setActiveTab("Enemies")}>
@@ -179,7 +180,7 @@ export const DeepDungeonHUD: React.FC<Props> = ({
             </div>
 
             {/* Tab content */}
-            <div className="flex-1 overflow-y-auto flex flex-col rounded-md p-1 ml-1">
+            <div className="flex-1 overflow-y-auto scrollable flex flex-col rounded-md p-1 ml-1">
               {activeTab === "Enemies" && <DungeonProgress category="Enemies" progress={progress} />}
               {activeTab === "Crystals" && <DungeonProgress category="Crystals" progress={progress} />}
               {activeTab === "Drops" && <DungeonDrops />}

@@ -4,7 +4,7 @@ import { Label } from "components/ui/Label";
 import { DD_SUNNYSIDE } from "../lib/deepDungeonSunnyside";
 import { ENEMY_TYPES, type EnemyType } from "../lib/Enemies";
 import {
-  LEVEL_DESIGNS,
+  getLevelDesign,
   DUNGEON_POINTS,
   CRYSTAL_DROP_TABLE,
   DROP_ITEMS_CONFIG,
@@ -172,8 +172,7 @@ interface Props {
 
 export const DungeonProgress: React.FC<Props> = ({ category, progress }) => {
   const currentLevel = progress.currentLevel;
-  const levelData = LEVEL_DESIGNS[currentLevel];
-  if (!levelData) return null;
+  const levelData = getLevelDesign(currentLevel);
 
   return (
     <InnerPanel className="flex flex-col h-full overflow-y-auto scrollable p-2 font-bold">
@@ -245,7 +244,7 @@ export const DungeonProgress: React.FC<Props> = ({ category, progress }) => {
                 <DungeonItemSlot
                   key={`${currentLevel}-${itemKey}`}
                   name={itemKey}
-                  current={progress.crystals[itemKey] ?? 0}
+                  current={progress.levelCrystals[itemKey] ?? 0}
                   total={c.count}
                   image={`world/DeepDungeonAssets/${itemKey}.png`}
                   energyDrops={energyDrops}

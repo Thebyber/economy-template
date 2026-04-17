@@ -13,13 +13,7 @@ export const HudContainer: React.FC<React.PropsWithChildren> = ({
           aria-label="Hud"
           className="fixed inset-0 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] pointer-events-none z-10"
         >
-          <div
-            onMouseDown={(e) => e.stopPropagation()}
-            onMouseUp={(e) => e.stopPropagation()}
-            onTouchStart={(e) => e.stopPropagation()}
-            onTouchEnd={(e) => e.stopPropagation()}
-            className="pointer-events-auto h-full w-full"
-          >
+          <div className="pointer-events-none h-full w-full">
             {children}
           </div>
         </div>,

@@ -34,12 +34,13 @@ export const ENEMY_TYPES: Record<EnemyType, EnemyStats> = {
     sprite: "skeleton",
     isAggressive: false,
     isRanged: false,
-    dropChance: 0.7, // 70% de soltar algo
+    dropChance: 0.8, // 80% de soltar algo
     lootTable: [
+      { key: "DEEP_COIN", weight: 0.01 },
       { key: "DEFENSE", weight: 0.25 },
       { key: "ATTACK", weight: 0.25 },
       { key: "CRIT", weight: 0.25 },
-      { key: "PICKAXE", weight: 0.25 },
+      { key: "PICKAXE", weight: 0.24 },
     ],
   },
   SLIME: {
@@ -53,12 +54,13 @@ export const ENEMY_TYPES: Record<EnemyType, EnemyStats> = {
     sprite: "slime",
     isAggressive: false,
     isRanged: false,
-    dropChance: 0.7, // 70% de soltar algo
+    dropChance: 0.7, // 7% de soltar algo
     lootTable: [
+      { key: "DEEP_COIN", weight: 0.01 },
       { key: "DEFENSE", weight: 0.2 },
       { key: "ATTACK", weight: 0.2 },
       { key: "CRIT", weight: 0.2 },
-      { key: "PICKAXE", weight: 0.4 },
+      { key: "PICKAXE", weight: 0.39 },
     ],
   },
   KNIGHT: {
@@ -72,12 +74,13 @@ export const ENEMY_TYPES: Record<EnemyType, EnemyStats> = {
     sprite: "knight",
     isAggressive: false,
     isRanged: false,
-    dropChance: 0.8, // 80% de soltar algo
+    dropChance: 0.9, // 90% de soltar algo
     lootTable: [
-      { key: "DEFENSE", weight: 0.7 },
-      { key: "ATTACK", weight: 0.1 },
-      { key: "CRIT", weight: 0.1 },
-      { key: "PICKAXE", weight: 0.1 },
+      { key: "DEEP_COIN", weight: 0.01 },
+      { key: "DEFENSE", weight: 0.69 },
+      { key: "ATTACK", weight: 0.10 },
+      { key: "CRIT", weight: 0.10 },
+      { key: "PICKAXE", weight: 0.10 },
     ],
   },
   FRANKENSTEIN: {
@@ -93,10 +96,11 @@ export const ENEMY_TYPES: Record<EnemyType, EnemyStats> = {
     damageAoE: 5,
     dropChance: 1,
     lootTable: [
-      { key: "DEFENSE", weight: 0.1 },
-      { key: "ATTACK", weight: 0.7 },
-      { key: "CRIT", weight: 0.1 },
-      { key: "PICKAXE", weight: 0.1 },
+      { key: "DEEP_COIN", weight: 0.01 },
+      { key: "DEFENSE", weight: 0.10 },
+      { key: "ATTACK", weight: 0.69 },
+      { key: "CRIT", weight: 0.10 },
+      { key: "PICKAXE", weight: 0.10 },
     ],
   },
   DEVIL: {
@@ -112,10 +116,11 @@ export const ENEMY_TYPES: Record<EnemyType, EnemyStats> = {
     damageAoE: 10,
     dropChance: 1, // Daño adicional a los tiles adyacentes
     lootTable: [
-      { key: "DEFENSE", weight: 0.1 },
-      { key: "ATTACK", weight: 0.1 },
-      { key: "CRIT", weight: 0.7 },
-      { key: "PICKAXE", weight: 0.1 },
+      { key: "DEEP_COIN", weight: 0.01 },
+      { key: "DEFENSE", weight: 0.10 },
+      { key: "ATTACK", weight: 0.10 },
+      { key: "CRIT", weight: 0.69 },
+      { key: "PICKAXE", weight: 0.10 },
     ],
   },
 };

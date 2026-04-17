@@ -421,8 +421,8 @@ export class EnemyContainer extends Phaser.GameObjects.Container {
   public attackPlayer() {
     if (this.isMoving || !this.player || this.isDead) return;
 
+    this.facePlayer();
     this.isMoving = true;
-    this.setDepth(150);
     this.playAnimationEnemies("attack");
 
     this.attackSound.play();
@@ -449,7 +449,6 @@ export class EnemyContainer extends Phaser.GameObjects.Container {
     // RECUPERACIÓN: El enemigo vuelve a estar listo tras 1 segundo
     this.scene.time.delayedCall(1000, () => {
       if (this.active && !this.isDead) {
-        this.setDepth(50);
         this.isMoving = false;
         this.playAnimationEnemies("idle");
       }
@@ -459,8 +458,8 @@ export class EnemyContainer extends Phaser.GameObjects.Container {
   public attackAoEPlayer() {
     if (this.isMoving || !this.player || this.isDead) return;
 
+    this.facePlayer();
     this.isMoving = true;
-    this.setDepth(150);
     this.playAnimationEnemies("attackAoE");
 
     this.attackAoESound?.play();
@@ -502,7 +501,6 @@ export class EnemyContainer extends Phaser.GameObjects.Container {
 
     this.scene.time.delayedCall(1000, () => {
       if (this.active && !this.isDead) {
-        this.setDepth(50);
         this.isMoving = false;
         this.playAnimationEnemies("idle");
       }

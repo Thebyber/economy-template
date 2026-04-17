@@ -1,4 +1,35 @@
 /**
+ * Maps scene crystal keys (e.g. "pink_crystal_1") to their DD_ITEM numeric ids.
+ * Used to convert Phaser-side crystal keys into economy item ids before storing
+ * in the run accumulator.
+ */
+export const CRYSTAL_SCENE_KEY_TO_ITEM_ID: Record<string, string> = {
+  pink_crystal_1: "2",
+  pink_crystal_2: "3",
+  pink_crystal_3: "4",
+  pink_crystal_4: "5",
+  pink_crystal_5: "6",
+
+  white_crystal_1: "7",
+  white_crystal_2: "8",
+  white_crystal_3: "9",
+  white_crystal_4: "10",
+  white_crystal_5: "11",
+
+  blue_crystal_1: "12",
+  blue_crystal_2: "13",
+  blue_crystal_3: "14",
+  blue_crystal_4: "15",
+  blue_crystal_5: "16",
+
+  prismora_crystal_1: "17",
+  prismora_crystal_2: "18",
+  prismora_crystal_3: "19",
+  prismora_crystal_4: "20",
+  prismora_crystal_5: "21",
+};
+
+/**
  * Numeric item IDs as configured in the Deep Dungeon economy dashboard.
  * All IDs are string keys matching `playerEconomy.balances`.
  */
@@ -129,6 +160,8 @@ export const DD_ITEM = {
   TROPHY_DEEPCOIN_GOLD: "89",
   TROPHY_DEEPCOIN_EMERALD: "90",
   TROPHY_DEEPCOIN_DIAMOND: "91",
+
+  ACTIVE_RUN: "92",
 } as const;
 
 export type DdItemId = (typeof DD_ITEM)[keyof typeof DD_ITEM];

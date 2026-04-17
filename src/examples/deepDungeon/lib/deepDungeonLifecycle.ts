@@ -82,14 +82,18 @@ export function applyDeepDungeonGameOver(
     next.balances[DD_ITEM.SCORE] = result.score;
   }
 
+  // dungeon level reached (high score — keep the best across runs)
+  const currentLevelReached = next.balances[DD_ITEM.DUNGEON_LEVEL_REACHED] ?? 0;
+  if (result.stats.dungeonLevelReached > currentLevelReached) {
+    next.balances[DD_ITEM.DUNGEON_LEVEL_REACHED] = result.stats.dungeonLevelReached;
+  }
+
   // player xp (cumulative)
   next.balances[DD_ITEM.PLAYER_XP] =
     (next.balances[DD_ITEM.PLAYER_XP] ?? 0) + result.playerXp;
 
   // lifetime stats (cumulative)
   const s = result.stats;
-  next.balances[DD_ITEM.DUNGEON_LEVEL_REACHED] =
-    (next.balances[DD_ITEM.DUNGEON_LEVEL_REACHED] ?? 0) + s.dungeonLevelReached;
   next.balances[DD_ITEM.ENEMIES_KILLED] =
     (next.balances[DD_ITEM.ENEMIES_KILLED] ?? 0) + s.enemiesKilled;
   next.balances[DD_ITEM.SLIMES_KILLED] =
@@ -105,6 +109,15 @@ export function applyDeepDungeonGameOver(
   next.balances[DD_ITEM.CRYSTALS_MINED] =
     (next.balances[DD_ITEM.CRYSTALS_MINED] ?? 0) + s.crystalsMined;
 
+  return { ok: true, playerEconomy: next };
+}
+
+// ─── FREE_ATTEMPTS ───────────────────────────────────────────────────────────
+
+/** Optimistically mint 3 free attempts. Server enforces the 24h cooldown. */
+export function applyDeepDungeonFreeAttempts(economy: Economy): ApplyResult {
+  const next = cloneMinigameSnapshot(economy);
+  next.balances[DD_ITEM.ATTEMPTS] = (next.balances[DD_ITEM.ATTEMPTS] ?? 0) + 3;
   return { ok: true, playerEconomy: next };
 }
 

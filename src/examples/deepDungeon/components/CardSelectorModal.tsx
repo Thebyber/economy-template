@@ -92,7 +92,7 @@ export const CardSelectorModal: React.FC<Props> = ({
   return (
     <>
       <Modal show>
-        <OuterPanel className="bg-[#ead4aa] p-3 text-center relative">
+        <OuterPanel className="bg-[#ead4aa] p-3 text-center relative w-full max-w-lg overflow-y-auto max-h-[90vh] scrollable">
           {/* ? catalog button */}
           <div
             className="absolute top-2 right-2 cursor-pointer hover:scale-110 transition-transform"
@@ -130,7 +130,7 @@ export const CardSelectorModal: React.FC<Props> = ({
               <OuterPanel
                 key={`${card.name}-${i}`}
                 onClick={() => handleSelect(card)}
-                className="w-40 p-2 cursor-pointer hover:scale-105 transition-all flex flex-col items-center"
+                className="w-[30vw] max-w-[160px] min-w-[100px] p-2 cursor-pointer hover:scale-105 transition-all flex flex-col items-center"
                 style={{
                   borderColor: card.color,
                   borderStyle: "solid",
@@ -144,7 +144,7 @@ export const CardSelectorModal: React.FC<Props> = ({
                   className="mb-1 uppercase font-bold"
                   style={{
                     color: card.color,
-                    fontSize: "20px",
+                    fontSize: "clamp(13px, 4vw, 20px)",
                     textAlign: "center",
                     textShadow: "1px 1px 0px #000, -1px -1px 0px #000, 1px -1px 0px #000, -1px 1px 0px #000",
                     letterSpacing: "1.5px",
@@ -192,7 +192,7 @@ export const CardSelectorModal: React.FC<Props> = ({
 
       {/* Card catalog modal */}
       <Modal show={showCatalog}>
-        <OuterPanel className="bg-[#ead4aa] p-3">
+        <OuterPanel className="bg-[#ead4aa] p-3 w-full max-w-lg max-h-[90vh] overflow-y-auto scrollable">
           <div className="flex items-center justify-between mb-3 font-bold">
             <Label type="formula" className="uppercase">{"Card Drop Catalog"}</Label>
             <img
@@ -204,7 +204,7 @@ export const CardSelectorModal: React.FC<Props> = ({
             />
           </div>
 
-          <div className="overflow-y-auto scrollable pr-1" style={{ maxHeight: "380px" }}>
+          <div className="overflow-y-auto scrollable pr-1" style={{ maxHeight: "min(380px, 70vh)" }}>
             {RARITY_INFO.map((rarity) => {
               const cardsOfRarity = CARD_POOL.filter((c) => c.type === rarity.type);
               const perCard =

@@ -361,7 +361,7 @@ export const LEVEL_DESIGNS: Record<number, LevelDesign> = {
       { type: "white", level: 5, count: 1 },
       { type: "blue", level: 2, count: 4 },
     ],
-    pickaxes: 6,
+    pickaxes: 3,
   },
   5: {
     enemies: [
@@ -468,10 +468,10 @@ export const LEVEL_DESIGNS: Record<number, LevelDesign> = {
     ],
     traps: 10,
     crystals: [
-      { type: "blue", level: 4, count: 2 },
-      { type: "prismora", level: 1, count: 5 },
-      { type: "prismora", level: 3, count: 3 },
-      { type: "prismora", level: 5, count: 1 },
+      { type: "pink", level: 1, count: 5 },
+      { type: "pink", level: 3, count: 3 },
+      { type: "pink", level: 5, count: 1 },
+      { type: "white", level: 2, count: 4 },
     ],
     pickaxes: 3,
   },
@@ -483,10 +483,10 @@ export const LEVEL_DESIGNS: Record<number, LevelDesign> = {
     ],
     traps: 10,
     crystals: [
-      { type: "blue", level: 4, count: 2 },
-      { type: "prismora", level: 1, count: 5 },
-      { type: "prismora", level: 3, count: 3 },
-      { type: "prismora", level: 5, count: 1 },
+      { type: "pink", level: 2, count: 4 },
+      { type: "pink", level: 4, count: 2 },
+      { type: "white", level: 1, count: 5 },
+      { type: "white", level: 3, count: 3 },
     ],
     pickaxes: 3,
   },
@@ -498,10 +498,10 @@ export const LEVEL_DESIGNS: Record<number, LevelDesign> = {
     ],
     traps: 10,
     crystals: [
-      { type: "blue", level: 4, count: 2 },
-      { type: "prismora", level: 1, count: 5 },
-      { type: "prismora", level: 3, count: 3 },
-      { type: "prismora", level: 5, count: 1 },
+      { type: "pink", level: 3, count: 3 },
+      { type: "pink", level: 5, count: 1 },
+      { type: "white", level: 2, count: 4 },
+      { type: "white", level: 4, count: 2 },
     ],
     pickaxes: 3,
   },
@@ -513,10 +513,10 @@ export const LEVEL_DESIGNS: Record<number, LevelDesign> = {
     ],
     traps: 10,
     crystals: [
-      { type: "blue", level: 4, count: 2 },
-      { type: "prismora", level: 1, count: 5 },
-      { type: "prismora", level: 3, count: 3 },
-      { type: "prismora", level: 5, count: 1 },
+      { type: "white", level: 1, count: 5 },
+      { type: "white", level: 3, count: 3 },
+      { type: "white", level: 5, count: 1 },
+      { type: "blue", level: 2, count: 4 },
     ],
     pickaxes: 3,
   },
@@ -528,10 +528,10 @@ export const LEVEL_DESIGNS: Record<number, LevelDesign> = {
     ],
     traps: 10,
     crystals: [
-      { type: "blue", level: 4, count: 2 },
-      { type: "prismora", level: 1, count: 5 },
-      { type: "prismora", level: 3, count: 3 },
-      { type: "prismora", level: 5, count: 1 },
+      { type: "white", level: 2, count: 4 },
+      { type: "white", level: 4, count: 2 },
+      { type: "blue", level: 1, count: 5 },
+      { type: "blue", level: 3, count: 3 },
     ],
     pickaxes: 3,
   },
@@ -543,10 +543,10 @@ export const LEVEL_DESIGNS: Record<number, LevelDesign> = {
     ],
     traps: 10,
     crystals: [
+      { type: "white", level: 3, count: 3 },
+      { type: "white", level: 5, count: 1 },
+      { type: "blue", level: 2, count: 4 },
       { type: "blue", level: 4, count: 2 },
-      { type: "prismora", level: 1, count: 5 },
-      { type: "prismora", level: 3, count: 3 },
-      { type: "prismora", level: 5, count: 1 },
     ],
     pickaxes: 3,
   },
@@ -558,10 +558,10 @@ export const LEVEL_DESIGNS: Record<number, LevelDesign> = {
     ],
     traps: 10,
     crystals: [
-      { type: "blue", level: 4, count: 2 },
-      { type: "prismora", level: 1, count: 5 },
-      { type: "prismora", level: 3, count: 3 },
-      { type: "prismora", level: 5, count: 1 },
+      { type: "white", level: 4, count: 2 },
+      { type: "blue", level: 1, count: 5 },
+      { type: "blue", level: 3, count: 3 },
+      { type: "blue", level: 5, count: 1 },
     ],
     pickaxes: 3,
   },
@@ -573,10 +573,10 @@ export const LEVEL_DESIGNS: Record<number, LevelDesign> = {
     ],
     traps: 10,
     crystals: [
+      { type: "blue", level: 2, count: 4 },
       { type: "blue", level: 4, count: 2 },
       { type: "prismora", level: 1, count: 5 },
       { type: "prismora", level: 3, count: 3 },
-      { type: "prismora", level: 5, count: 1 },
     ],
     pickaxes: 3,
   },
@@ -588,10 +588,10 @@ export const LEVEL_DESIGNS: Record<number, LevelDesign> = {
     ],
     traps: 10,
     crystals: [
-      { type: "blue", level: 4, count: 2 },
-      { type: "prismora", level: 1, count: 5 },
-      { type: "prismora", level: 3, count: 3 },
-      { type: "prismora", level: 5, count: 1 },
+      { type: "blue", level: 3, count: 3 },
+      { type: "blue", level: 5, count: 1 },
+      { type: "prismora", level: 2, count: 4 },
+      { type: "prismora", level: 4, count: 2 },
     ],
     pickaxes: 3,
   },
@@ -611,6 +611,52 @@ export const LEVEL_DESIGNS: Record<number, LevelDesign> = {
     pickaxes: 3,
   },
 };
+
+/**
+ * Returns the level design for any level.
+ * - Levels 1–20: exact config from LEVEL_DESIGNS.
+ * - Levels 21+:  crystals/traps/pickaxes cycle through levels 1–10;
+ *                enemies are randomised (harder distribution as level climbs).
+ */
+export function getLevelDesign(level: number): LevelDesign {
+  if (level <= 20) return LEVEL_DESIGNS[level] ?? LEVEL_DESIGNS[1];
+
+  // Cycle crystals & traps through levels 1–10
+  const baseLevel = ((level - 1) % 10) + 1;
+  const base = LEVEL_DESIGNS[baseLevel];
+
+  // Scale enemy difficulty with level (every 5 levels adds ~2 extra enemies)
+  const extra = Math.floor((level - 21) / 5);
+
+  const devilCount  = 3  + extra + Math.floor(Math.random() * 4);
+  const frankCount  = 5  + extra + Math.floor(Math.random() * 4);
+  const knightCount = 8  + extra + Math.floor(Math.random() * 5);
+
+  const enemies: EnemyConfig[] = [
+    { type: "KNIGHT",       count: knightCount },
+    { type: "FRANKENSTEIN", count: frankCount },
+    { type: "DEVIL",        count: devilCount },
+  ];
+
+  // Randomly include lighter enemies at lower probability
+  if (Math.random() > 0.5) enemies.push({ type: "SKELETON", count: 2 + Math.floor(Math.random() * 4) });
+  if (Math.random() > 0.7) enemies.push({ type: "SLIME",    count: 1 + Math.floor(Math.random() * 3) });
+
+  return {
+    enemies,
+    traps: base.traps,
+    crystals: base.crystals,
+    pickaxes: 3,
+  };
+}
+
+/**
+ * Returns the fog color for any level, cycling levels 21+ through the 1–10 palette.
+ */
+export function getLevelFogColor(level: number): number {
+  const effectiveLevel = level <= 20 ? level : ((level - 1) % 10) + 1;
+  return LEVEL_SETTINGS[effectiveLevel]?.fogColor ?? 0x191a27;
+}
 
 // También puedes mover otras constantes que tengas por ahí
 export const TILE_SIZE = 16;
@@ -658,6 +704,13 @@ export const DROP_ITEMS_CONFIG: Record<string, DropItem> = {
     label: "+1 Pickaxe",
     action: (stats) => {
       stats.inventory.pickaxe += 1;
+    },
+  },
+  DEEP_COIN: {
+    sprite: "deep_token",
+    label: "+1 Deep Coin",
+    action: (_stats) => {
+      // Handled separately via phaserApi.onDeepCoinDropped — no stat mutation needed.
     },
   },
 };
@@ -835,6 +888,10 @@ export const POINTS: {
     image: "world/DeepDungeonAssets/Stairs.png",
     description: translate("deepdungeon.points10"),
   },
+  {
+    image: "world/DeepDungeonAssets/xp.png",
+    description: translate("deepdungeon.points11"),
+  },
 ];
 export const ENEMIES_GUIDE: {
   image: string;
@@ -898,5 +955,19 @@ export const STATS_GUIDE: {
   {
     image: "world/DeepDungeonAssets/redbar_02.png",
     description: translate("deepdungeon.stats8"),
+  },
+];
+export const MOVE_GUIDE: {
+  image: string;
+  description: string;
+  width?: number;
+}[] = [
+  {
+    image: "world/DeepDungeonAssets/key.png",
+    description: translate("deepdungeon.move1"),
+  },
+  {
+    image: "world/DeepDungeonAssets/phone.png",
+    description: translate("deepdungeon.move2"),
   },
 ];

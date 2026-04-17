@@ -14,8 +14,9 @@ import {
   CRYSTAL_DROP_TABLE,
   DROP_ITEMS_CONFIG,
   PORTAL_NAME,
-  LEVEL_DESIGNS,
   LEVEL_MAPS,
+  getLevelDesign,
+  getLevelFogColor,
   type Card,
 } from "./DeepDungeonConstants";
 
@@ -48,6 +49,8 @@ export interface DeepDungeonPhaserApi {
   onCrystalMined: (crystalKey: string) => void;
   /** Called when an enemy is killed (to track for GAMEOVER payload). */
   onEnemyKilled: (enemyType: EnemyType) => void;
+  /** Called when a DEEP_COIN is picked up as an enemy drop. */
+  onDeepCoinDropped: () => void;
 }
 
 // ── Scene ────────────────────────────────────────────────────────────────────
@@ -71,6 +74,7 @@ export class DeepDungeonScene extends BaseScene {
   private occupiedTiles: Set<string> = new Set();
   public groundLayer: any;
   public wallLayer: any;
+
 
   // Input
   private playerKeys?: Record<string, Phaser.Input.Keyboard.Key>;
@@ -201,6 +205,7 @@ export class DeepDungeonScene extends BaseScene {
     this.load.image("shield", "world/DeepDungeonAssets/shield.png");
     this.load.image("crit", "world/DeepDungeonAssets/crit.png");
     this.load.image("pickaxe", "world/DeepDungeonAssets/pickaxe.png");
+    this.load.image("deep_token", "world/DeepDungeonAssets/deep_token.png");
 
     this.load.spritesheet("spikes", "world/DeepDungeonAssets/spikes.png", { frameWidth: 96, frameHeight: 64 });
     this.load.spritesheet("spikes2", "world/DeepDungeonAssets/spikes2.png", { frameWidth: 96, frameHeight: 64 });
@@ -222,7 +227,6 @@ export class DeepDungeonScene extends BaseScene {
     });
     this.load.spritesheet("frankenstein_attackAoE", "world/DeepDungeonAssets/frankenstein2_attack.png", { frameWidth: 96, frameHeight: 64 });
     this.load.spritesheet("devil_attackAoE", "world/DeepDungeonAssets/devil2_attack.png", { frameWidth: 96, frameHeight: 96 });
-    this.load.spritesheet("devil_attack", "world/DeepDungeonAssets/devil3_attack.png", { frameWidth: 96, frameHeight: 64 });
   }
 
   async create() {
@@ -248,6 +252,12 @@ export class DeepDungeonScene extends BaseScene {
     }
 
     super.create();
+
+    // Remove any nameTag left by BaseScene
+    if (this.currentPlayer) {
+      const old = this.currentPlayer.getByName("nameTag") as Phaser.GameObjects.Text | undefined;
+      if (old) this.currentPlayer.remove(old, true);
+    }
 
     this.groundLayer = this.layers["Ground"];
     this.wallLayer = this.layers["Wall"];
@@ -339,9 +349,14 @@ export class DeepDungeonScene extends BaseScene {
   // DeepDungeon manages all player animations through loadBumpkinAnimations() and GridMovement.
   public updatePlayer(): void {
     // Skip idle()/walk() from BaseScene — DeepDungeon uses grid-based movement.
-    // Still update depth so the player renders above/below objects correctly.
+    // Update depth for player and enemies so Y-sorting renders them correctly.
     if (this.currentPlayer) {
       this.currentPlayer.setDepth(Math.floor(this.currentPlayer.y));
+    }
+    for (const enemy of this.enemies) {
+      if (enemy.active) {
+        enemy.setDepth(Math.floor(enemy.y));
+      }
     }
   }
 
@@ -568,6 +583,12 @@ export class DeepDungeonScene extends BaseScene {
   public applyStatDrop(key: string) {
     const config = DROP_ITEMS_CONFIG[key as keyof typeof DROP_ITEMS_CONFIG];
     if (!config) return;
+
+    if (key === "DEEP_COIN") {
+      this.phaserApi?.onDeepCoinDropped?.();
+      return;
+    }
+
     // Build a mutable proxy that matches the PlayerStats shape
     const proxy = {
       attack: this._stats.attack,
@@ -753,7 +774,7 @@ export class DeepDungeonScene extends BaseScene {
     this.enemies = [];
     this.traps = [];
 
-    const config = LEVEL_DESIGNS[level] ?? LEVEL_DESIGNS[1];
+    const config = getLevelDesign(level);
     this.spawnStairsRandomly();
     this.spawnPickaxes(config.pickaxes);
     config.enemies.forEach((e) => this.spawnEnemies(e.type, e.count));
@@ -767,8 +788,7 @@ export class DeepDungeonScene extends BaseScene {
     const { widthInPixels: w, heightInPixels: h } = this.map;
     this.darknessMask = this.add.renderTexture(0, 0, w, h).setOrigin(0, 0);
 
-    const darkLevels = [1,2,3,4,5,11,12,13,14,15];
-    this.darknessMask.fill(darkLevels.includes(this.currentLevel) ? 0x191a27 : 0x271714, 1);
+    this.darknessMask.fill(getLevelFogColor(this.currentLevel), 1);
     this.darknessMask.setDepth(2000).setScrollFactor(1);
 
     this.visionCircle = this.make.graphics({ x: 0, y: 0 });

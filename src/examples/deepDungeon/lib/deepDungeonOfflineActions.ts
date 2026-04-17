@@ -28,44 +28,44 @@ export const DEEP_DUNGEON_OFFLINE_ACTIONS: Record<string, unknown> = {
     burn: { ACTIVE_RUN: { amount: 1 } },
     mint: {
       // deep_coin
-      "0": { min: 0, max: 500, dailyCap: 1000 },
+      "0": { min: 0, max: 999999, dailyCap: 999999 },
       // crystals — pink
-      "2": { min: 0, max: 20, dailyCap: 100 },
-      "3": { min: 0, max: 20, dailyCap: 100 },
-      "4": { min: 0, max: 20, dailyCap: 100 },
-      "5": { min: 0, max: 20, dailyCap: 100 },
-      "6": { min: 0, max: 20, dailyCap: 100 },
+      "2": { min: 0, max: 999999, dailyCap: 999999 },
+      "3": { min: 0, max: 999999, dailyCap: 999999 },
+      "4": { min: 0, max: 999999, dailyCap: 999999 },
+      "5": { min: 0, max: 999999, dailyCap: 999999 },
+      "6": { min: 0, max: 999999, dailyCap: 999999 },
       // crystals — white
-      "7": { min: 0, max: 20, dailyCap: 100 },
-      "8": { min: 0, max: 20, dailyCap: 100 },
-      "9": { min: 0, max: 20, dailyCap: 100 },
-      "10": { min: 0, max: 20, dailyCap: 100 },
-      "11": { min: 0, max: 20, dailyCap: 100 },
+      "7": { min: 0, max: 999999, dailyCap: 999999 },
+      "8": { min: 0, max: 999999, dailyCap: 999999 },
+      "9": { min: 0, max: 999999, dailyCap: 999999 },
+      "10": { min: 0, max: 999999, dailyCap: 999999 },
+      "11": { min: 0, max: 999999, dailyCap: 999999 },
       // crystals — blue
-      "12": { min: 0, max: 20, dailyCap: 100 },
-      "13": { min: 0, max: 20, dailyCap: 100 },
-      "14": { min: 0, max: 20, dailyCap: 100 },
-      "15": { min: 0, max: 20, dailyCap: 100 },
-      "16": { min: 0, max: 20, dailyCap: 100 },
+      "12": { min: 0, max: 999999, dailyCap: 999999 },
+      "13": { min: 0, max: 999999, dailyCap: 999999 },
+      "14": { min: 0, max: 999999, dailyCap: 999999 },
+      "15": { min: 0, max: 999999, dailyCap: 999999 },
+      "16": { min: 0, max: 999999, dailyCap: 999999 },
       // crystals — prismora
-      "17": { min: 0, max: 20, dailyCap: 100 },
-      "18": { min: 0, max: 20, dailyCap: 100 },
-      "19": { min: 0, max: 20, dailyCap: 100 },
-      "20": { min: 0, max: 20, dailyCap: 100 },
-      "21": { min: 0, max: 20, dailyCap: 100 },
+      "17": { min: 0, max: 999999, dailyCap: 999999 },
+      "18": { min: 0, max: 999999, dailyCap: 999999 },
+      "19": { min: 0, max: 999999, dailyCap: 999999 },
+      "20": { min: 0, max: 999999, dailyCap: 999999 },
+      "21": { min: 0, max: 999999, dailyCap: 999999 },
       // lifetime stats (additive, server accumulates)
-      "22": { min: 0, max: 20, dailyCap: 1000 }, // dungeon_level_reached
-      "23": { min: 0, max: 200, dailyCap: 5000 }, // enemies_killed
-      "24": { min: 0, max: 200, dailyCap: 5000 }, // slimes_killed
-      "25": { min: 0, max: 200, dailyCap: 5000 }, // skeletons_killed
-      "26": { min: 0, max: 200, dailyCap: 5000 }, // knights_killed
-      "27": { min: 0, max: 200, dailyCap: 5000 }, // frankensteins_killed
-      "28": { min: 0, max: 200, dailyCap: 5000 }, // devils_killed
-      "29": { min: 0, max: 200, dailyCap: 5000 }, // crystals_mined
+      "22": { min: 0, max: 999999, dailyCap: 999999 }, // dungeon_level_reached
+      "23": { min: 0, max: 999999, dailyCap: 999999 }, // enemies_killed
+      "24": { min: 0, max: 999999, dailyCap: 999999 }, // slimes_killed
+      "25": { min: 0, max: 999999, dailyCap: 999999 }, // skeletons_killed
+      "26": { min: 0, max: 999999, dailyCap: 999999 }, // knights_killed
+      "27": { min: 0, max: 999999, dailyCap: 999999 }, // frankensteins_killed
+      "28": { min: 0, max: 999999, dailyCap: 999999 }, // devils_killed
+      "29": { min: 0, max: 999999, dailyCap: 999999 }, // crystals_mined
       // score (best — server keeps max, not sum)
       "30": { min: 0, max: 999999, dailyCap: 999999 },
       // player_xp
-      "31": { min: 0, max: 1000, dailyCap: 10000 },
+      "31": { min: 0, max: 999999, dailyCap: 999999 },
     },
   },
 

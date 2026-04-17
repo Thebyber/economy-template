@@ -293,6 +293,9 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
     if (scene.textures.exists(this.spriteKey)) {
       // If we have idle sheet then we can create the idle animation and set the sprite up straight away
       const idle = scene.add.sprite(0, 2, this.spriteKey).setOrigin(0.5);
+      // Start invisible to prevent a black-rectangle flash on iOS/WebGL while the
+      // GPU uploads the texture. Made visible after one tick (imperceptible to player).
+      idle.setAlpha(0);
       this.add(idle);
       if (this.clothing.aura !== undefined) {
         this.moveTo(idle, 2);
@@ -310,6 +313,10 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
       if (this.silhouette?.active) {
         this.silhouette?.destroy();
       }
+
+      scene.time.delayedCall(150, () => {
+        if (idle.active) idle.setAlpha(1);
+      });
 
       this.ready = true;
     } else {
@@ -336,6 +343,7 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
         const idle = scene.add
           .sprite(0, 2, this.spriteKey as string)
           .setOrigin(0.5);
+        idle.setAlpha(0);
         this.add(idle);
         if (this.clothing.aura !== undefined) {
           this.moveTo(idle, 2);
@@ -359,6 +367,9 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
         if (this.silhouette?.active) {
           this.silhouette?.destroy();
         }
+        scene.time.delayedCall(150, () => {
+          if (idle.active) idle.setAlpha(1);
+        });
       });
 
       // Load micro interactions animations

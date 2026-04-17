@@ -163,7 +163,7 @@ export const DungeonDrops: React.FC = () => {
                 {CRYSTAL_COLOR_LABELS[color]}{" Crystals"}
               </Label>
 
-              <div className="grid grid-cols-3 gap-2 mb-3 font-bold">
+              <div className="grid grid-cols-2 gap-2 mb-3 font-bold">
                 {[1, 2, 3, 4, 5].map((level) => {
                   const key = `${color}_crystal_${level}`;
                   const dropTable = CRYSTAL_DROP_TABLE[key];

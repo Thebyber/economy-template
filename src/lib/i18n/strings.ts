@@ -100,6 +100,7 @@ export const EN_STRINGS: Record<string, string> = {
   "deepdungeon.instructions5": "Mine crystals to recover energy and survive longer in the depths. You can find 3 pickaxes on each map",
   "deepdungeon.instructions6": "When moving to the next map via the staircase, you win 15 energy and you can choose 1 power-up from 3 random cards.",
   
+
   "deepdungeon.stats1": "Energy is the player's life. If your energy drops to 0, you will lose the run and all progress made in that run.",
   "deepdungeon.stats2": "Life of the enemy.",
   "deepdungeon.stats3": "Attack of the enemy/player.",
@@ -125,6 +126,11 @@ export const EN_STRINGS: Record<string, string> = {
   "deepdungeon.points8": "Frankenstein: Defeating it grants 600 points.",
   "deepdungeon.points9": "Devil: Defeating it grants 1000 points.",
   "deepdungeon.points10": "Advancing to the next map grants 50 points, if you reach map 5 you will earn 250 points",
+  "deepdungeon.points11": "Player XP is earned during a run: +5 per crystal mined, +10 per enemy killed.",
+  
+  "deepdungeon.move": "Move",
+  "deepdungeon.move1": "Computer version: WASD or arrow keys or swipe to move, mine or attack",
+  "deepdungeon.move2": "Mobile version: Swipe to move, mine or attack",
 };
 
 function interpolate(

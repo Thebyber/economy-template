@@ -66,7 +66,7 @@ export const DeepDungeonGame: React.FC<Props> = ({
   }, []);
 
   return (
-    <div>
+    <div style={{ touchAction: "none", userSelect: "none" }}>
       <div id="game-content" />
     </div>
   );

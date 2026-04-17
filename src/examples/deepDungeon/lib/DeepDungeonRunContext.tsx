@@ -7,6 +7,8 @@ import React, {
 } from "react";
 import type { EnemyType } from "./Enemies";
 import type { DeepDungeonRunResult } from "./deepDungeonLifecycle";
+import { CRYSTAL_SCENE_KEY_TO_ITEM_ID } from "./deepDungeonItemIds";
+import { DUNGEON_POINTS } from "../DeepDungeonConstants";
 
 /**
  * Mutable run state tracked on the React side for GAMEOVER payload assembly.
@@ -15,7 +17,10 @@ import type { DeepDungeonRunResult } from "./deepDungeonLifecycle";
  */
 interface RunAccumulator {
   deepCoins: number;
-  crystals: Record<string, number>;
+  crystals: Record<string, number>;        // item-ID keys, for GAMEOVER payload
+  crystalsBySceneKey: Record<string, number>; // scene-key keys, for inventory display
+  levelEnemies: Record<string, number>;    // per-level enemy kills, resets on level change
+  levelCrystals: Record<string, number>;   // per-level crystal mines (scene keys), resets on level change
   score: number;
   playerXp: number;
   dungeonLevelReached: number;
@@ -32,6 +37,9 @@ function makeEmptyAccumulator(): RunAccumulator {
   return {
     deepCoins: 0,
     crystals: {},
+    crystalsBySceneKey: {},
+    levelEnemies: {},
+    levelCrystals: {},
     score: 0,
     playerXp: 0,
     dungeonLevelReached: 1,
@@ -46,15 +54,23 @@ function makeEmptyAccumulator(): RunAccumulator {
 }
 
 export interface RunProgress {
+  /** Per-level enemy kills — resets when the player advances to the next map. Used by codex. */
   enemies: Record<string, number>;
+  /** Per-level crystal mines (scene keys) — resets on level change. Used by codex. */
+  levelCrystals: Record<string, number>;
+  /** Cumulative crystals by scene key across the whole run. Used by inventory. */
   crystals: Record<string, number>;
+  /** Cumulative enemy kills by type across the whole run. Used by inventory. */
+  totalEnemiesByType: Record<string, number>;
   currentLevel: number;
+  deepCoins: number;
 }
 
 interface DeepDungeonRunContextValue {
   resetRun: () => void;
   addCrystal: (crystalKey: string) => void;
   addEnemyKill: (enemyType: EnemyType) => void;
+  addDeepCoin: () => void;
   setLevel: (level: number) => void;
   buildResult: () => DeepDungeonRunResult;
   getProgress: () => RunProgress;
@@ -70,18 +86,21 @@ export const DeepDungeonRunProvider: React.FC<{ children: ReactNode }> = ({ chil
   }, []);
 
   const addCrystal = useCallback((crystalKey: string) => {
-    acc.current.crystals[crystalKey] = (acc.current.crystals[crystalKey] ?? 0) + 1;
+    const itemId = CRYSTAL_SCENE_KEY_TO_ITEM_ID[crystalKey] ?? crystalKey;
+    acc.current.crystals[itemId] = (acc.current.crystals[itemId] ?? 0) + 1;
+    acc.current.crystalsBySceneKey[crystalKey] = (acc.current.crystalsBySceneKey[crystalKey] ?? 0) + 1;
+    acc.current.levelCrystals[crystalKey] = (acc.current.levelCrystals[crystalKey] ?? 0) + 1;
     acc.current.crystalsMined += 1;
-    acc.current.deepCoins += 1; // each crystal also yields 1 deep coin
-    acc.current.score += 10;
+    acc.current.score += DUNGEON_POINTS.CRYSTALS[crystalKey as keyof typeof DUNGEON_POINTS.CRYSTALS] ?? 10;
     acc.current.playerXp += 5;
   }, []);
 
   const addEnemyKill = useCallback((enemyType: EnemyType) => {
     acc.current.enemiesKilled += 1;
-    acc.current.score += 20;
+    acc.current.score += DUNGEON_POINTS.ENEMIES[enemyType as keyof typeof DUNGEON_POINTS.ENEMIES] ?? 20;
     acc.current.playerXp += 10;
-    acc.current.deepCoins += 1;
+    const typeKey = enemyType.toLowerCase();
+    acc.current.levelEnemies[typeKey] = (acc.current.levelEnemies[typeKey] ?? 0) + 1;
     switch (enemyType) {
       case "SLIME":
         acc.current.slimesKilled += 1;
@@ -101,23 +120,32 @@ export const DeepDungeonRunProvider: React.FC<{ children: ReactNode }> = ({ chil
     }
   }, []);
 
+  const addDeepCoin = useCallback(() => {
+    acc.current.deepCoins += 1;
+  }, []);
+
   const setLevel = useCallback((level: number) => {
     acc.current.dungeonLevelReached = level;
     acc.current.score += level * 50;
+    acc.current.levelEnemies = {};
+    acc.current.levelCrystals = {};
   }, []);
 
   const getProgress = useCallback((): RunProgress => {
     const a = acc.current;
     return {
-      enemies: {
-        skeleton: a.skeletonsKilled,
-        slime: a.slimesKilled,
-        knight: a.knightsKilled,
-        frankenstein: a.frankensteinsKilled,
-        devil: a.devilsKilled,
+      enemies: { ...a.levelEnemies },
+      levelCrystals: { ...a.levelCrystals },
+      crystals: { ...a.crystalsBySceneKey },
+      totalEnemiesByType: {
+        slime:         a.slimesKilled,
+        skeleton:      a.skeletonsKilled,
+        knight:        a.knightsKilled,
+        frankenstein:  a.frankensteinsKilled,
+        devil:         a.devilsKilled,
       },
-      crystals: { ...a.crystals },
       currentLevel: a.dungeonLevelReached,
+      deepCoins: a.deepCoins,
     };
   }, []);
 
@@ -143,7 +171,7 @@ export const DeepDungeonRunProvider: React.FC<{ children: ReactNode }> = ({ chil
 
   return (
     <DeepDungeonRunContext.Provider
-      value={{ resetRun, addCrystal, addEnemyKill, setLevel, buildResult, getProgress }}
+      value={{ resetRun, addCrystal, addEnemyKill, addDeepCoin, setLevel, buildResult, getProgress }}
     >
       {children}
     </DeepDungeonRunContext.Provider>
