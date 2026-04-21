@@ -2,9 +2,10 @@ import { BaseScene } from "./world/scenes/BaseScene";
 import type { SceneId } from "./world/sceneIds";
 import type { DeepDungeonPlayerStats } from "./lib/deepDungeonLifecycle";
 import { GridMovement } from "./lib/GridMovement";
-import { EnemyType } from "./lib/Enemies";
+import { EnemyType, getScaledEnemyStats } from "./lib/Enemies";
 import { EnemyContainer } from "./containers/EnemyContainer";
 import { PickaxeContainer } from "./containers/PickaxeContainer";
+import { ChestContainer } from "./containers/ChestContainer";
 import { TrapContainer } from "./containers/TrapContainer";
 import { StairContainer } from "./containers/StairContainer";
 import { CrystalContainer } from "./containers/CrystalContainer";
@@ -13,12 +14,16 @@ import {
   AnimationKeys,
   CRYSTAL_DROP_TABLE,
   DROP_ITEMS_CONFIG,
+  INVENTORY_CAPS,
   PORTAL_NAME,
   LEVEL_MAPS,
+  POTION_RESTORE,
   getLevelDesign,
   getLevelFogColor,
   type Card,
 } from "./DeepDungeonConstants";
+import { tokenUriBuilder } from "lib/utils/tokenUriBuilder";
+import { getAnimationUrl } from "./world/lib/animations";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -31,7 +36,7 @@ export interface DeepDungeonRunStats {
   attack: number;
   defense: number;
   criticalChance: number;
-  inventory: { pickaxe: number };
+  inventory: { pickaxe: number; potion: number; key_chest: number };
   currentLevel: number;
 }
 
@@ -51,6 +56,8 @@ export interface DeepDungeonPhaserApi {
   onEnemyKilled: (enemyType: EnemyType) => void;
   /** Called when a DEEP_COIN is picked up as an enemy drop. */
   onDeepCoinDropped: () => void;
+  /** Called when the player opens a chest. */
+  onChestOpened?: () => void;
 }
 
 // ── Scene ────────────────────────────────────────────────────────────────────
@@ -63,6 +70,7 @@ export class DeepDungeonScene extends BaseScene {
   public enemies: EnemyContainer[] = [];
   private traps: TrapContainer[] = [];
   public crystals: CrystalContainer[] = [];
+  public chests: ChestContainer[] = [];
   private energyOrbsGroup!: Phaser.Physics.Arcade.Group;
   private darknessMask?: Phaser.GameObjects.RenderTexture;
   private visionCircle?: Phaser.GameObjects.Graphics;
@@ -72,6 +80,7 @@ export class DeepDungeonScene extends BaseScene {
   private currentLevel: number = 1;
   private isTransitioning = false;
   private occupiedTiles: Set<string> = new Set();
+  private _movementLockCount = 0;
   public groundLayer: any;
   public wallLayer: any;
 
@@ -84,6 +93,7 @@ export class DeepDungeonScene extends BaseScene {
   private swipeDown = false;
   private _lastFogX = -1;
   private _lastFogY = -1;
+  private _needPickaxeThrottle = false;
 
   // Run stats — local mutable copy, updated during gameplay
   private _stats!: DeepDungeonRunStats;
@@ -162,6 +172,32 @@ export class DeepDungeonScene extends BaseScene {
   }
 
   preload() {
+    // Pre-load bumpkin idle+walking sheet in the same preload phase as enemy sprites.
+    // Enemy sprites (skeleton, slime…) are preloaded here and work fine on Android Chrome.
+    // The bumpkin was loaded dynamically post-create, causing GPU upload timing issues.
+    // Loading it here ensures the texture is in VRAM before create() runs.
+    const gameState = this.registry.get("gameState") as any;
+    const clothing = gameState?.bumpkin?.equipped;
+    if (clothing) {
+      const key = tokenUriBuilder(clothing);
+      const bumpkinSheets: Array<[string, string[]]> = [
+        [key, ["idle", "walking"]],
+        [`${key}-bumpkin-attack-sheet`, ["attack"]],
+        [`${key}-bumpkin-hurt-sheet`, ["hurt"]],
+        [`${key}-bumpkin-death-sheet`, ["death"]],
+        [`${key}-bumpkin-mining-sheet`, ["mining"]],
+        [`${key}-bumpkin-swimming-sheet`, ["swimming"]],
+      ];
+      for (const [sheetKey, anim] of bumpkinSheets) {
+        if (!this.textures.exists(sheetKey)) {
+          this.load.spritesheet(sheetKey, getAnimationUrl(clothing, anim as any), {
+            frameWidth: 96,
+            frameHeight: 64,
+          });
+        }
+      }
+    }
+
     const mapIndex = ((this.currentLevel - 1) % 10) + 1;
     this.load.tilemapTiledJSON("deep-dungeon", `world/DeepDungeonAssets/map${mapIndex}.json`);
     this.load.image("Tileset-deep-dungeon", "world/DeepDungeonAssets/Tileset-deep-dungeon.png");
@@ -176,6 +212,8 @@ export class DeepDungeonScene extends BaseScene {
     super.preload();
 
     this.load.image("stairs", "world/DeepDungeonAssets/Stairs.png");
+    this.load.image("chest", "world/DeepDungeonAssets/chest.png");
+    this.load.image("chest_open", "world/DeepDungeonAssets/chest_open.png");
 
     // Audio
     this.load.audio("backgroundMusic", "/world/DeepDungeonAssets/backgroundMusic.wav");
@@ -205,6 +243,8 @@ export class DeepDungeonScene extends BaseScene {
     this.load.image("shield", "world/DeepDungeonAssets/shield.png");
     this.load.image("crit", "world/DeepDungeonAssets/crit.png");
     this.load.image("pickaxe", "world/DeepDungeonAssets/pickaxe.png");
+    this.load.image("key_chest", "world/DeepDungeonAssets/key_chest.png");
+    this.load.image("potion", "world/DeepDungeonAssets/potion.png");
     this.load.image("deep_token", "world/DeepDungeonAssets/deep_token.png");
 
     this.load.spritesheet("spikes", "world/DeepDungeonAssets/spikes.png", { frameWidth: 96, frameHeight: 64 });
@@ -246,7 +286,7 @@ export class DeepDungeonScene extends BaseScene {
         attack: reg?.attack ?? 1,
         defense: reg?.defense ?? 1,
         criticalChance: reg?.criticalChance ?? 5,
-        inventory: { pickaxe: reg?.startingPickaxes ?? 1 },
+        inventory: { pickaxe: reg?.startingPickaxes ?? 1, potion: reg?.startingPotions ?? 1, key_chest: reg?.startingKeyChests ?? 1 },
         currentLevel: this.currentLevel,
       };
     }
@@ -284,7 +324,8 @@ export class DeepDungeonScene extends BaseScene {
       );
     }
 
-    const levelData = LEVEL_MAPS[this.currentLevel];
+    const effectiveMapLevel = ((this.currentLevel - 1) % 10) + 1;
+    const levelData = LEVEL_MAPS[effectiveMapLevel];
 
     this.backgroundMusic = this.sound.add("backgroundMusic", { loop: true, volume: 0.2 });
     this.backgroundMusic.play();
@@ -414,8 +455,9 @@ export class DeepDungeonScene extends BaseScene {
     if (!this._stats || this.currentPlayer?.isDead) return;
 
     const isCrit = canCrit && Math.random() < (critChanceBase ?? 0.1);
-    const attackAfterCrit = isCrit ? baseAttack * 2 : baseAttack;
-    const damageDealt = Math.max(1, Math.round(attackAfterCrit - (this._stats.defense ?? 0)));
+    const playerDefense = this._stats.defense ?? 0;
+    const effectiveDefense = isCrit ? Math.floor(playerDefense / 2) : playerDefense;
+    const damageDealt = Math.max(1, baseAttack - effectiveDefense);
     const newEnergy = this._stats.energy - damageDealt;
 
     if (canCrit && this.currentPlayer) {
@@ -442,8 +484,9 @@ export class DeepDungeonScene extends BaseScene {
 
     const isCrit = Math.random() < (this._stats.criticalChance / 100);
     const baseAttack = this._stats.attack ?? 1;
-    const totalAttack = isCrit ? baseAttack * 2 : baseAttack;
-    const damageDealt = Math.max(1, Math.round(totalAttack - (enemy.stats.defense || 0)));
+    const enemyDefense = enemy.stats.defense || 0;
+    const effectiveDefense = isCrit ? Math.floor(enemyDefense / 2) : enemyDefense;
+    const damageDealt = Math.max(1, Math.round(baseAttack - effectiveDefense));
 
     if (isCrit) {
       this.spawnCritText(enemy.x, enemy.y, false);
@@ -455,11 +498,24 @@ export class DeepDungeonScene extends BaseScene {
     enemy.takeDamage(damageDealt, isCrit);
   }
 
+  public lockMovement() {
+    this._movementLockCount++;
+    this.gridMovement?.setFrozen(true);
+  }
+
+  public unlockMovement() {
+    this._movementLockCount = Math.max(0, this._movementLockCount - 1);
+    if (this._movementLockCount === 0) {
+      this.gridMovement?.setFrozen(false);
+    }
+  }
+
   public handlePlayerDeath() {
     if (this.isTransitioning || !this.currentPlayer || this.currentPlayer.isDead) return;
 
     this.currentPlayer.isDead = true;
     this.isTransitioning = true;
+    this._movementLockCount = 0;
 
     this.currentPlayer.dead();
     this.sound.play("dead_bumpkin", { volume: 0.75 });
@@ -512,7 +568,15 @@ export class DeepDungeonScene extends BaseScene {
 
   public handleMining(crystal: CrystalContainer) {
     const pickaxes = this._stats?.inventory.pickaxe ?? 0;
-    if (pickaxes <= 0 || crystal.isBeingMined) return;
+    if (crystal.isBeingMined) return;
+    if (pickaxes <= 0) {
+      if (!this._needPickaxeThrottle) {
+        this._needPickaxeThrottle = true;
+        this.spawnFloatingText(crystal.x, crystal.y, "Need pickaxe!");
+        this.time.delayedCall(2000, () => { this._needPickaxeThrottle = false; });
+      }
+      return;
+    }
 
     crystal.isBeingMined = true;
     this.sound.play("mine_crystal", { volume: 0.5 });
@@ -550,7 +614,20 @@ export class DeepDungeonScene extends BaseScene {
 
   public addPickaxe() {
     const current = this._stats?.inventory.pickaxe ?? 0;
+    if (current >= INVENTORY_CAPS.pickaxe) return;
     this.updateStats({ inventory: { ...this._stats.inventory, pickaxe: current + 1 } });
+  }
+
+  public usePotion(): boolean {
+    const potions = this._stats?.inventory.potion ?? 0;
+    if (potions <= 0) return false;
+    const newEnergy = Math.min(this._stats.maxEnergy, this._stats.energy + POTION_RESTORE);
+    this.updateStats({
+      energy: newEnergy,
+      inventory: { ...this._stats.inventory, potion: potions - 1 },
+    });
+    try { this.sound.play("win_energy", { volume: 0.4 }); } catch (_) {}
+    return true;
   }
 
   public onEnemyKilled(type: EnemyType) {
@@ -565,7 +642,9 @@ export class DeepDungeonScene extends BaseScene {
     const newMaxEnergy = this._stats.maxEnergy + (bonus.maxEnergy ?? 0);
     const newEnergy = Math.min(newMaxEnergy, this._stats.energy + (bonus.energy ?? 0) + (bonus.maxEnergy ?? 0));
     const inv = { ...this._stats.inventory };
-    if (bonus.pickaxe) inv.pickaxe = (inv.pickaxe ?? 0) + bonus.pickaxe;
+    if (bonus.pickaxe) inv.pickaxe = Math.min(INVENTORY_CAPS.pickaxe, (inv.pickaxe ?? 0) + bonus.pickaxe);
+    if (bonus.potion) inv.potion = Math.min(INVENTORY_CAPS.potion, (inv.potion ?? 0) + bonus.potion);
+    if (bonus.key_chest) inv.key_chest = Math.min(INVENTORY_CAPS.key_chest, (inv.key_chest ?? 0) + bonus.key_chest);
     this.updateStats({
       attack: this._stats.attack + (bonus.attack ?? 0),
       defense: this._stats.defense + (bonus.defense ?? 0),
@@ -599,6 +678,9 @@ export class DeepDungeonScene extends BaseScene {
       inventory: { ...this._stats.inventory },
     };
     config.action(proxy);
+    proxy.inventory.pickaxe  = Math.min(INVENTORY_CAPS.pickaxe,   proxy.inventory.pickaxe  ?? 0);
+    proxy.inventory.potion   = Math.min(INVENTORY_CAPS.potion,    proxy.inventory.potion   ?? 0);
+    proxy.inventory.key_chest = Math.min(INVENTORY_CAPS.key_chest, proxy.inventory.key_chest ?? 0);
     this.updateStats({
       attack: proxy.attack,
       defense: proxy.defense,
@@ -606,6 +688,32 @@ export class DeepDungeonScene extends BaseScene {
       energy: proxy.energy,
       maxEnergy: proxy.maxEnergy,
       inventory: proxy.inventory,
+    });
+  }
+
+  /** Called by ChestContainer when the player opens a chest. */
+  public applyChestDrop(statKey: string, amount: number) {
+    if (statKey === "deep_coin") {
+      this.phaserApi?.onDeepCoinDropped?.();
+      return;
+    }
+    const inv = { ...this._stats.inventory };
+    if (statKey === "key_chest") {
+      inv.key_chest = Math.max(0, (inv.key_chest ?? 0) + amount);
+      this.updateStats({ inventory: inv });
+      if (amount < 0) this.phaserApi?.onChestOpened?.();
+      return;
+    }
+    if (statKey === "potion") {
+      inv.potion = Math.min(INVENTORY_CAPS.potion, (inv.potion ?? 0) + amount);
+      this.updateStats({ inventory: inv });
+      return;
+    }
+    this.updateStats({
+      attack:         statKey === "attack"         ? this._stats.attack         + amount : this._stats.attack,
+      defense:        statKey === "defense"        ? this._stats.defense        + amount : this._stats.defense,
+      criticalChance: statKey === "criticalChance" ? this._stats.criticalChance + amount : this._stats.criticalChance,
+      inventory: inv,
     });
   }
 
@@ -678,7 +786,31 @@ export class DeepDungeonScene extends BaseScene {
     }
   }
 
-  private spawnEnemies(type: EnemyType, count: number) {
+  private spawnChests(count: number) {
+    const layer = this.map.getLayer("Ground");
+    if (!layer?.tilemapLayer || !this.currentPlayer) return;
+    const validTiles = layer.tilemapLayer.filterTiles((t: Phaser.Tilemaps.Tile) => t.index !== -1);
+
+    let spawned = 0, attempts = 0;
+    while (spawned < count && attempts < 200) {
+      attempts++;
+      const tile = Phaser.Utils.Array.GetRandom(validTiles) as Phaser.Tilemaps.Tile;
+      if (this.isTileOccupied(tile.pixelX, tile.pixelY)) continue;
+
+      const chest = new ChestContainer(this, tile.getCenterX(), tile.getCenterY());
+      this.chests.push(chest);
+
+      // Block player movement & trigger open on collision
+      this.physics.add.collider(this.currentPlayer as any, chest, () => chest.tryOpen());
+      // Block enemy movement
+      this.enemies.forEach((enemy) => this.physics.add.collider(enemy, chest));
+
+      this.markTileAsOccupied(tile.pixelX, tile.pixelY);
+      spawned++;
+    }
+  }
+
+  private spawnEnemies(type: EnemyType, count: number, floor: number) {
     const layer = this.map.getLayer("Ground");
     if (!layer?.tilemapLayer || !this.currentPlayer) return;
     const validTiles = layer.tilemapLayer.filterTiles((t: Phaser.Tilemaps.Tile) => t.index !== -1);
@@ -690,10 +822,14 @@ export class DeepDungeonScene extends BaseScene {
       const tile = validTiles[Math.floor(Math.random() * validTiles.length)];
       const x = tile.getCenterX(), y = tile.getCenterY();
 
-      if (Phaser.Math.Distance.Between(x, y, this.currentPlayer.x, this.currentPlayer.y) > 120) {
-        const enemy = new EnemyContainer({ scene: this, x, y, player: this.currentPlayer, type });
+      if (
+        Phaser.Math.Distance.Between(x, y, this.currentPlayer.x, this.currentPlayer.y) > 120 &&
+        !this.isNearWater(tile.x, tile.y)
+      ) {
+        const enemy = new EnemyContainer({ scene: this, x, y, player: this.currentPlayer, type, scaledStats: getScaledEnemyStats(type, floor) });
         this.enemies.push(enemy);
         this.crystals.forEach((crystal) => this.physics.add.collider(enemy, crystal));
+        this.chests.forEach((chest) => this.physics.add.collider(enemy, chest));
         spawned++;
       }
     }
@@ -773,13 +909,23 @@ export class DeepDungeonScene extends BaseScene {
     this.crystals = [];
     this.enemies = [];
     this.traps = [];
+    this.chests = [];
+
+    // Reserve the player's starting tile so nothing spawns on top of them
+    if (this.currentPlayer) {
+      this.markTileAsOccupied(
+        Math.floor(this.currentPlayer.x / 16) * 16,
+        Math.floor(this.currentPlayer.y / 16) * 16,
+      );
+    }
 
     const config = getLevelDesign(level);
     this.spawnStairsRandomly();
     this.spawnPickaxes(config.pickaxes);
-    config.enemies.forEach((e) => this.spawnEnemies(e.type, e.count));
+    config.enemies.forEach((e) => this.spawnEnemies(e.type, e.count, level));
     this.spawnTraps(config.traps);
     config.crystals.forEach((c) => this.spawnCrystals(c.type as CrystalType, c.level, c.count));
+    this.spawnChests(1);
   }
 
   // ── Fog ────────────────────────────────────────────────────────────────────

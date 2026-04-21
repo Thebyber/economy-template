@@ -162,6 +162,13 @@ export const DD_ITEM = {
   TROPHY_DEEPCOIN_DIAMOND: "91",
 
   ACTIVE_RUN: "92",
+
+  // ── Consumables ───────────────────────────────────────────
+  KEY_CHEST: "93",
+  POTION: "94",
+
+  // ── Lifetime stats (continued) ────────────────────────────
+  CHESTS_OPENED: "95",
 } as const;
 
 export type DdItemId = (typeof DD_ITEM)[keyof typeof DD_ITEM];

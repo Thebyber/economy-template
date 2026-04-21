@@ -32,8 +32,19 @@ const StatBadge: React.FC<{ value: number | string; icon: string; color: string 
 
 // ── Main Component ────────────────────────────────────────────────────────────
 
+const CHEST_DROP_TABLE = [
+  { label: "+1 Potion",    icon: "potion",     chance: 100 },
+  { label: "+1 Attack",    icon: "sword",      chance: 25 },
+  { label: "+1 Defense",   icon: "shield",     chance: 25 },
+  { label: "+2% Critical Chance", icon: "crit",  chance: 25 },
+  { label: "+2 Attack",    icon: "sword",      chance: 7  },
+  { label: "+2 Defense",   icon: "shield",     chance: 7  },
+  { label: "+5% Critical Chance", icon: "crit", chance: 7 },
+  { label: "+1 Deep Coin", icon: "deep_token", chance: 4  },
+];
+
 export const DungeonDrops: React.FC = () => {
-  const [tab, setTab] = useState<"enemies" | "crystals">("enemies");
+  const [tab, setTab] = useState<"enemies" | "crystals" | "chests">("enemies");
 
   return (
     <InnerPanel className="flex flex-col h-full p-2">
@@ -65,6 +76,19 @@ export const DungeonDrops: React.FC = () => {
             {"Crystals"}
           </div>
         </button>
+        <button
+          className={`font-bold text-[12px] uppercase px-2 py-1 rounded-sm border transition-colors ${
+            tab === "chests"
+              ? "bg-[#ead4aa] border-[#754733] text-brown-1100"
+              : "bg-transparent border-transparent text-brown-1100 hover:text-brown-1100"
+          }`}
+          onClick={() => setTab("chests")}
+        >
+          <div className="flex items-center gap-1">
+            <img src="/world/DeepDungeonAssets/chest.png" className="w-6 h-6" alt="" />
+            {"Chests"}
+          </div>
+        </button>
       </div>
 
       {/* Content */}
@@ -83,9 +107,14 @@ export const DungeonDrops: React.FC = () => {
                   className="flex flex-col items-center bg-[#ead4aa] border border-[#754733] p-2 rounded-sm"
                 >
                   {/* Name */}
-                  <span className="text-[12px] font-bold text-brown-1100 uppercase text-center mb-1">
-                    {config.name}
-                  </span>
+                  <div className="flex items-center gap-1 mb-1">
+                    <span className="text-[12px] font-bold text-brown-1100 uppercase text-center">
+                      {config.name}
+                    </span>
+                    <span className="text-[10px] font-bold text-white bg-[#754733] rounded px-1">
+                      {"Lv.1"}
+                    </span>
+                  </div>
 
                   {/* Image */}
                   <img
@@ -195,7 +224,7 @@ export const DungeonDrops: React.FC = () => {
                       {/* Points */}
                       {points > 0 && (
                         <div className="text-[12px] font-bold text-green-1100 mb-1">
-                          {points}{" pts"}
+                          {points}{" Points"}
                         </div>
                       )}
 
@@ -210,7 +239,7 @@ export const DungeonDrops: React.FC = () => {
                             <div key={drop.amount} className="flex items-center gap-1 justify-between px-1">
                               <div className="flex items-center gap-0.5">
                                 <img src={DD_SUNNYSIDE.icons.lightning} className="w-6 h-6" alt="energy" />
-                                <span className="text-[12px] font-bold text-brown-1100">{`+${drop.amount} energy`}</span>
+                                <span className="text-[12px] font-bold text-brown-1100">{`+${drop.amount} Energy`}</span>
                               </div>
                               <span className="text-[12px] font-bold text-green-1100">
                                 {Math.round((drop.weight / totalWeight) * 100)}{"%"}
@@ -225,6 +254,53 @@ export const DungeonDrops: React.FC = () => {
               </div>
             </div>
           ))}
+        {/* ── CHESTS ── */}
+        {tab === "chests" && (
+          <div className="flex flex-col items-center gap-3">
+            <div className="flex flex-col items-center bg-[#ead4aa] border border-[#754733] p-3 rounded-sm w-full">
+              {/* Header */}
+              <img
+                src="/world/DeepDungeonAssets/chest.png"
+                className="w-12 h-12 mb-2"
+                style={{ imageRendering: "pixelated" }}
+                alt="chest"
+              />
+              <span className="text-[12px] font-bold text-brown-1100 uppercase mb-1">{"Chest"}</span>
+              <span className="text-[12px] font-bold text-brown-700 mb-2 text-center">
+                {"Requires 1 key to open"}
+              </span>
+
+              {/* Points reward */}
+              <div className="text-[13px] font-bold text-green-1100 mb-3">
+                {DUNGEON_POINTS.CHEST_OPEN}{" Points on open"}
+              </div>
+
+              {/* Drop table */}
+              <div className="w-full border-t border-brown-1100/20 pt-2">
+                <div className="flex items-center gap-1 justify-center mb-2">
+                  <img src="/world/DeepDungeonAssets/random.png" className="w-6 h-6" alt="drop" />
+                  <span className="text-[12px] font-bold text-brown-700 uppercase">{"Drop Table"}</span>
+                </div>
+                <div className="flex flex-col gap-1">
+                  {CHEST_DROP_TABLE.map((row) => (
+                    <div key={row.label} className="flex items-center justify-between px-2">
+                      <div className="flex items-center gap-1">
+                        <img
+                          src={`/world/DeepDungeonAssets/${row.icon}.png`}
+                          className="w-6 h-6"
+                          style={{ imageRendering: "pixelated" }}
+                          alt={row.label}
+                        />
+                        <span className="text-[12px] font-bold text-brown-1100">{row.label}</span>
+                      </div>
+                      <span className="text-[12px] font-bold text-green-1100">{row.chance}{"%"}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </InnerPanel>
   );

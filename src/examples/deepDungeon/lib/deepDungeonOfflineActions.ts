@@ -28,7 +28,7 @@ export const DEEP_DUNGEON_OFFLINE_ACTIONS: Record<string, unknown> = {
     burn: { ACTIVE_RUN: { amount: 1 } },
     mint: {
       // deep_coin
-      "0": { min: 0, max: 999999, dailyCap: 999999 },
+      "0": { min: 0, max: 20, dailyCap: 999999 },
       // crystals — pink
       "2": { min: 0, max: 999999, dailyCap: 999999 },
       "3": { min: 0, max: 999999, dailyCap: 999999 },
@@ -63,9 +63,11 @@ export const DEEP_DUNGEON_OFFLINE_ACTIONS: Record<string, unknown> = {
       "28": { min: 0, max: 999999, dailyCap: 999999 }, // devils_killed
       "29": { min: 0, max: 999999, dailyCap: 999999 }, // crystals_mined
       // score (best — server keeps max, not sum)
-      "30": { min: 0, max: 999999, dailyCap: 999999 },
+      "30": { min: 0, max: 9999999, dailyCap: 9999999 },
       // player_xp
       "31": { min: 0, max: 999999, dailyCap: 999999 },
+      // chets_opened
+      "95": { min: 0, max: 999999, dailyCap: 999999 },
     },
   },
 
@@ -73,5 +75,57 @@ export const DEEP_DUNGEON_OFFLINE_ACTIONS: Record<string, unknown> = {
   BUY_ATTEMPTS: {
     showInShop: true,
     mint: { "1": { amount: 3 } },
+  },
+
+  /** Blacksmith: burn 3× pink_crystal_1 → produce pink_crystal_2 in 15m */
+  blacksmith_refine: {
+    burn: { "2": { amount: 3 } },
+    produce: { "3": {} },
+    collect: { "3": { amount: 1, seconds: 900 } },
+  },
+
+  /** Blacksmith: burn 3× pink_crystal_2 → produce pink_crystal_3 in 15m */
+  blacksmith_refine_1: {
+    burn: { "3": { amount: 3 } },
+    produce: { "4": {} },
+    collect: { "4": { amount: 1, seconds: 900 } },
+  },
+  /** Blacksmith: burn 3× pink_crystal_3 → produce pink_crystal_4 in 15m */
+  blacksmith_refine_2: {
+    burn: { "4": { amount: 3 } },
+    produce: { "5": {} },
+    collect: { "5": { amount: 1, seconds: 900 } },
+  },
+  /** Blacksmith: burn 3× pink_crystal_4 → produce pink_crystal_5 in 15m */
+  blacksmith_refine_3: {
+    burn: { "5": { amount: 3 } },
+    produce: { "6": {} },
+    collect: { "6": { amount: 1, seconds: 900 } },
+  },
+
+  /** Blacksmith: burn 1× pink_crystal_2 → recover pink_crystal_1 in 15m*/
+  blacksmith_dismantle: {
+    burn: { "3": { amount: 1 } },
+    produce: { "2": {} },
+    collect: { "2": { amount: 1, seconds: 900 } },
+  },
+
+  /** Blacksmith: burn 1× pink_crystal_3 → recover pink_crystal_2 in 15m */
+  blacksmith_dismantle_1: {
+    burn: { "4": { amount: 1 } },
+    produce: { "3": {} },
+    collect: { "3": { amount: 1, seconds: 900 } },
+  },
+  /** Blacksmith: burn 1× pink_crystal_4 → recover pink_crystal_3 in 15m */
+  blacksmith_dismantle_2: {
+    burn: { "5": { amount: 1 } },
+    produce: { "4": {} },
+    collect: { "4": { amount: 1, seconds: 900 } },
+  },
+  /** Blacksmith: burn 1× pink_crystal_5 → recover pink_crystal_4 in 15m */
+  blacksmith_dismantle_3: {
+    burn: { "6": { amount: 1 } },
+    produce: { "5": {} },
+    collect: { "5": { amount: 1, seconds: 900 } },
   },
 };

@@ -13,6 +13,7 @@ interface Props {
   scene: Phaser.Scene;
   player?: BumpkinContainer;
   type: EnemyType;
+  scaledStats?: EnemyStats;
 }
 
 interface SceneWithTraps extends Phaser.Scene {
@@ -57,7 +58,7 @@ export class EnemyContainer extends Phaser.GameObjects.Container {
   private attackSound!: Phaser.Sound.BaseSound;
   private attackAoESound?: Phaser.Sound.BaseSound;
 
-  constructor({ x, y, scene, player, type }: Props) {
+  constructor({ x, y, scene, player, type, scaledStats }: Props) {
     super(scene, x, y);
     this.instanceId = Phaser.Utils.String.UUID(); // Genera algo como "abc-123"
     this.scene = scene as DeepDungeonScene;
@@ -67,8 +68,8 @@ export class EnemyContainer extends Phaser.GameObjects.Container {
     // Inicializamos con la posición actual para no bloquear el 0,0
     this.nextGridX = Math.floor(x / 16) * 16;
     this.nextGridY = Math.floor(y / 16) * 16;
-    // 1. Cargar estadísticas una sola vez
-    this.stats = ENEMY_TYPES[this.enemyType];
+    // 1. Cargar estadísticas una sola vez (escaladas por piso si se pasan)
+    this.stats = scaledStats ?? ENEMY_TYPES[this.enemyType];
     this.currentHp = this.stats.hp; // Aquí debería ser 2 según tu Enemies.ts
     this.trapDamage = this.stats.trapDamage ?? 2; // Si no existe, 2 por defecto
     // Cargar sonidos de ataque basados en el tipo de enemigo
@@ -118,12 +119,12 @@ export class EnemyContainer extends Phaser.GameObjects.Container {
       -20,
       `${this.currentHp}`,
       {
-        fontSize: "7px", // Un poco más grande para que se lea mejor
+        fontSize: "7px",
         fontFamily: "monospace",
         color: "#ffffff",
         stroke: "#000000",
         strokeThickness: 2,
-        resolution: 2, // Mejora la nitidez en pantallas de alta densidad
+        resolution: Math.ceil(window.devicePixelRatio ?? 1) * 2,
       },
     ).setOrigin(0.5);
     this.healthText.setAlign("center");
@@ -249,17 +250,30 @@ export class EnemyContainer extends Phaser.GameObjects.Container {
       return crystalGridX === targetX && crystalGridY === targetY;
     });
 
+    const sceneChests = (this.scene as any).chests as { x: number; y: number; active: boolean }[] | undefined;
+    const hasChest = (sceneChests || []).some((chest) =>
+      chest.active &&
+      Math.floor(chest.x / 16) * 16 === targetX &&
+      Math.floor(chest.y / 16) * 16 === targetY,
+    );
+
     const sceneWithLayers = this.scene as SceneWithLayers;
     const layers = sceneWithLayers.layers;
     const hasWall =
       layers?.["Wall"]?.getTileAtWorldXY(targetX, targetY) !== null;
     const hasWater =
       layers?.["Water"]?.getTileAtWorldXY(targetX, targetY) !== null;
+    const isNearWater = (this.scene as any).isNearWater?.(
+      Math.floor(targetX / 16),
+      Math.floor(targetY / 16),
+    ) ?? false;
 
     if (
       hasWall ||
       hasWater ||
+      isNearWater ||
       hasCrystal ||
+      hasChest ||
       (targetX === pX && targetY === pY)
     ) {
       return;
@@ -424,21 +438,15 @@ export class EnemyContainer extends Phaser.GameObjects.Container {
     this.facePlayer();
     this.isMoving = true;
     this.playAnimationEnemies("attack");
-
     this.attackSound.play();
 
-    // IMPACTO: A los 500ms (ajusta según el frame de tu animación de golpe)
-    this.scene.time.delayedCall(50, () => {
-      if (
-        !this ||
-        !this.active ||
-        this.isDead ||
-        !this.spriteBody ||
-        !this.scene
-      )
-        return;
+    (this.scene as any).lockMovement?.();
 
-      // LLAMADA AL ÁRBITRO: Pasamos el daño base, la escena aplica críticos y tu defensa
+    this.scene.time.delayedCall(50, () => {
+      if (!this || !this.active || this.isDead || !this.spriteBody || !this.scene) {
+        (this.scene as any).unlockMovement?.();
+        return;
+      }
       (this.scene as any).handlePlayerDamage(
         this.stats.damage,
         this.stats.criticalChance,
@@ -446,8 +454,8 @@ export class EnemyContainer extends Phaser.GameObjects.Container {
       );
     });
 
-    // RECUPERACIÓN: El enemigo vuelve a estar listo tras 1 segundo
     this.scene.time.delayedCall(1000, () => {
+      (this.scene as any).unlockMovement?.();
       if (this.active && !this.isDead) {
         this.isMoving = false;
         this.playAnimationEnemies("idle");
@@ -464,42 +472,30 @@ export class EnemyContainer extends Phaser.GameObjects.Container {
 
     this.attackAoESound?.play();
 
-    // Congelamos el movimiento del jugador durante el AoE
-    (this.scene as any).gridMovement?.setFrozen(true);
+    (this.scene as any).lockMovement?.();
 
-    // IMPACTO AOE
     this.scene.time.delayedCall(50, () => {
-      if (
-        !this ||
-        !this.active ||
-        this.isDead ||
-        !this.spriteBody ||
-        !this.scene
-      ) {
-        (this.scene as any).gridMovement?.setFrozen(false);
+      if (!this || !this.active || this.isDead || !this.spriteBody || !this.scene) {
+        (this.scene as any).unlockMovement?.();
         return;
       }
 
-      // 1. Aplicamos el daño
       (this.scene as any).handlePlayerDamage(
         this.stats.damageAoE,
         this.stats.criticalChance,
         true,
       );
 
-      // 2. Solo hurt() si el jugador sigue vivo
       const player = this.player as any;
       if (player && !player.isDead) {
         if (typeof player.hurt === "function") {
           player.hurt();
         }
       }
-
-      // Liberamos el movimiento tras aplicar el daño
-      (this.scene as any).gridMovement?.setFrozen(false);
     });
 
     this.scene.time.delayedCall(1000, () => {
+      (this.scene as any).unlockMovement?.();
       if (this.active && !this.isDead) {
         this.isMoving = false;
         this.playAnimationEnemies("idle");
@@ -552,21 +548,6 @@ export class EnemyContainer extends Phaser.GameObjects.Container {
       this.heartIcon.setVisible(isAlive);
     }
   }
-  private calculateDamageToPlayer(rawDamage: number): number {
-    const stats = this.scene.getStats();
-    const playerDefense = stats?.defense || 0;
-
-    // 1. Calcular si es crítico
-    const isCritical = Math.random() < (this.stats.criticalChance || 0);
-
-    // 2. Calculamos el ataque bruto (bruto = ataque base o ataque x 2 si es crítico)
-    const rawAttack = isCritical ? rawDamage * 2 : rawDamage;
-
-    // 3. Restamos la defensa al ataque ya potenciado
-    // Esto hace que el crítico sea mucho más valioso contra enemigos acorazados
-    const finalDamage = Math.max(1, rawAttack - playerDefense);
-    return Math.max(1, finalDamage);
-  }
   public takeTrapDamage(amount: number) {
     // 1. Si ya está muerto o procesando otro daño, salimos
     if (this.currentHp <= 0 || this.isMoving) return;
@@ -610,14 +591,8 @@ export class EnemyContainer extends Phaser.GameObjects.Container {
   }
   private spawnDrop(selectedKey: DropKey) {
     const config = DROP_ITEMS_CONFIG[selectedKey as DropConfigKey];
-    const playUISound = (fileName: string) => {
-      const audio = new Audio(`/world/DeepDungeonAssets/${fileName}.mp3`);
-      audio.volume = 0.4;
-      audio.play().catch(() => {});
-    };
     if (!config || !config.sprite) return;
 
-    // Creamos el drop directamente en la escena
     const drop = this.scene.physics.add.sprite(this.x, this.y, config.sprite);
 
     if (drop.body) {
@@ -629,7 +604,6 @@ export class EnemyContainer extends Phaser.GameObjects.Container {
 
     drop.setDepth(40);
 
-    // Guardamos una referencia local a la escena para el overlap
     const currentScene = this.scene as DeepDungeonScene;
 
     if (!this.player) return;
@@ -638,18 +612,12 @@ export class EnemyContainer extends Phaser.GameObjects.Container {
       drop,
       () => {
         overlapObj.destroy();
-
-        if (
-          config.label &&
-          typeof currentScene.spawnFloatingText === "function"
-        ) {
+        drop.destroy();
+        currentScene.applyStatDrop(selectedKey);
+        if (config.label && typeof currentScene.spawnFloatingText === "function") {
           currentScene.spawnFloatingText(drop.x, drop.y, config.label);
         }
-
-        playUISound("win_item");
-        currentScene.applyStatDrop(selectedKey);
-
-        drop.destroy();
+        try { currentScene.sound.play("win_item", { volume: 0.4 }); } catch (_) {}
       },
       undefined,
       this,

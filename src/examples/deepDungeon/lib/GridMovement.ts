@@ -1,6 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { BumpkinContainer } from "../world/containers/BumpkinContainer";
 import { CrystalContainer } from "../containers/CrystalContainer";
+import { ChestContainer } from "../containers/ChestContainer";
 
 interface Enemy {
   x: number;
@@ -16,6 +17,7 @@ interface Enemy {
 interface SceneWithEnemies extends Phaser.Scene {
   enemies: Enemy[];
   crystals: CrystalContainer[];
+  chests: ChestContainer[];
   checkTrapsAt(x: number, y: number): void;
   handleMining(crystal: CrystalContainer): void;
   packetSentAt?: number;
@@ -158,6 +160,22 @@ export class GridMovement {
       scene.handleMining(targetCrystal);
       return;
     }
+
+    // 3b. COMPROBAR COFRES
+    const chests = Array.isArray((this.scene as SceneWithEnemies).chests) ? (this.scene as SceneWithEnemies).chests : [];
+    const targetChest = chests.find(
+      (c: ChestContainer) =>
+        c.active &&
+        Math.floor(c.x / 16) * 16 === nextGridX &&
+        Math.floor(c.y / 16) * 16 === nextGridY,
+    );
+    if (targetChest) {
+      if (dx < 0) this.currentPlayer.faceLeft();
+      else if (dx > 0) this.currentPlayer.faceRight();
+      if (!targetChest.isOpened) targetChest.tryOpen();
+      return;
+    }
+
     // 4. COMPROBAR ENEMIGOS Y ATACAR
     const enemies = (this.scene as SceneWithEnemies).enemies || [];
 
@@ -180,6 +198,7 @@ export class GridMovement {
 
       this.attackCooldown = true;
       player.attack();
+      (this.scene as any).lockMovement?.();
 
       // Aplicamos el daño calculado
       (this.scene as any).handleEnemyDamage(targetEnemy);
@@ -195,9 +214,10 @@ export class GridMovement {
         }
       });
 
-      // Liberar cooldown tras 1000ms (tiempo suficiente para el contraataque)
+      // Liberar cooldown y lock de movimiento del ataque del jugador
       this.scene.time.delayedCall(1000, () => {
         this.attackCooldown = false;
+        (this.scene as any).unlockMovement?.();
       });
 
       return;

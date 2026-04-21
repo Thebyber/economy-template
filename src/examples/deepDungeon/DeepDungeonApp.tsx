@@ -3,6 +3,7 @@ import { MemoryRouter } from "react-router-dom";
 import { MinigamePortalProvider } from "lib/portal";
 import { DEEP_DUNGEON_OFFLINE_ACTIONS } from "./lib/deepDungeonOfflineActions";
 import { createDeepDungeonOfflineMinigame } from "./lib/deepDungeonOfflineMinigame";
+import { DEEP_DUNGEON_OFFLINE_ECONOMY_META } from "./lib/deepDungeonOfflineEconomyMeta";
 import { DeepDungeonRoutes } from "./DeepDungeonRoutes";
 
 /**
@@ -13,10 +14,11 @@ import { DeepDungeonRoutes } from "./DeepDungeonRoutes";
  */
 export const DeepDungeonApp: React.FC = () => {
   return (
-    <MemoryRouter initialEntries={["/home"]}>
+    <MemoryRouter initialEntries={["/lobby"]}>
       <MinigamePortalProvider
         offlineActions={DEEP_DUNGEON_OFFLINE_ACTIONS}
         offlineMinigame={createDeepDungeonOfflineMinigame}
+        offlineEconomyMeta={DEEP_DUNGEON_OFFLINE_ECONOMY_META}
       >
         <DeepDungeonRoutes />
       </MinigamePortalProvider>

@@ -7,6 +7,7 @@ import { Label } from "components/ui/Label";
 import { useMinigameSession } from "lib/portal";
 import { DeepDungeonHome } from "./DeepDungeonHome";
 import { DeepDungeonGamePage } from "./DeepDungeonGamePage";
+import { LobbyPage } from "./LobbyPage";
 
 const ApiErrorModal: React.FC = () => {
   const { apiError, clearApiError } = useMinigameSession();
@@ -29,7 +30,8 @@ export const DeepDungeonRoutes: React.FC = () => {
     <>
       <ApiErrorModal />
       <Routes>
-        <Route path="/" element={<Navigate to="/home" replace />} />
+        <Route path="/" element={<Navigate to="/lobby" replace />} />
+        <Route path="/lobby" element={<LobbyPage />} />
         <Route path="/home" element={<DeepDungeonHome />} />
         <Route path="/game" element={<DeepDungeonGamePage />} />
       </Routes>

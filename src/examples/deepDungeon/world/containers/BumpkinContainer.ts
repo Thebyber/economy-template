@@ -286,91 +286,87 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
     this.hammeringAnimationKey = `${this.spriteKey}-bumpkin-hammering`;
     this.swimmingAnimationKey = `${this.spriteKey}-bumpkin-swimming`;
 
+    // Create action animations immediately if textures are already preloaded.
+    // This runs BEFORE the await so animations are ready from the first frame,
+    // avoiding the race where attack/hurt are called before the async load completes.
+    if (scene.textures.exists(this.attackSpriteKey as string)) this.createAttackAnimation();
+    if (scene.textures.exists(this.hurtSpriteKey as string)) this.createHurtAnimation();
+    if (scene.textures.exists(this.deathSpriteKey as string)) this.createDeathAnimation();
+    if (scene.textures.exists(this.miningSpriteKey as string)) this.createMiningAnimation();
+    if (scene.textures.exists(this.swimmingSpriteKey as string)) this.createSwimmingAnimation();
+
     await buildNPCSheets({
       parts: this.clothing,
     }); //Removing this causes Aura to not show onload
 
+    // Shared helper: swap the silhouette sprite's texture for the real idle sheet.
+    // This mirrors exactly how attack/hurt work — they call this.sprite.anims.play()
+    // on an already-visible sprite instead of creating a new sprite with setAlpha(0→1).
+    // Creating a new sprite and revealing it causes the black-rectangle flash on Android
+    // Chrome; reusing the existing visible sprite does not.
+    const swapSilhouetteToIdle = () => {
+      const sil = this.silhouette;
+      if (sil?.active) {
+        sil.setTexture(this.spriteKey as string);
+        sil.setOrigin(0.5);
+        sil.setPosition(0, 2);
+        if (this.clothing.aura !== undefined) {
+          this.moveTo(sil, 2);
+        } else if (this.shadow?.active) {
+          this.moveTo(sil, 1);
+        }
+        this.sprite = sil;
+        this.silhouette = undefined;
+      } else {
+        // Silhouette already gone — fall back to creating a new sprite.
+        // At this point the texture has been in VRAM for a while so no flash.
+        const idle = scene.add.sprite(0, 2, this.spriteKey as string).setOrigin(0.5);
+        this.add(idle);
+        if (this.clothing.aura !== undefined) this.moveTo(idle, 2);
+        else if (this.shadow?.active) this.moveTo(idle, 1);
+        this.sprite = idle;
+      }
+      if (this.direction === "left") this.faceLeft();
+    };
+
     if (scene.textures.exists(this.spriteKey)) {
-      // If we have idle sheet then we can create the idle animation and set the sprite up straight away
-      const idle = scene.add.sprite(0, 2, this.spriteKey).setOrigin(0.5);
-      // Start invisible to prevent a black-rectangle flash on iOS/WebGL while the
-      // GPU uploads the texture. Made visible after one tick (imperceptible to player).
-      idle.setAlpha(0);
-      this.add(idle);
-      if (this.clothing.aura !== undefined) {
-        this.moveTo(idle, 2);
-      } else if (this.clothing.aura === undefined && this.shadow?.active) {
-        this.moveTo(idle, 1);
-      }
-      this.sprite = idle;
-
-      if (this.direction === "left") {
-        this.faceLeft();
-      }
-
-      this.sprite.play(this.idleAnimationKey, true);
-
-      if (this.silhouette?.active) {
-        this.silhouette?.destroy();
-      }
-
-      scene.time.delayedCall(150, () => {
-        if (idle.active) idle.setAlpha(1);
-      });
-
+      // Texture already cached — create animations then swap immediately.
+      this.createIdleAnimation(0, 8);
+      this.createWalkingAnimation(9, 16);
+      swapSilhouetteToIdle();
+      this.sprite!.play(this.idleAnimationKey as string, true);
       this.ready = true;
     } else {
-      // Set up base animations
-      const url = getAnimationUrl(this.clothing, [
-        "idle",
-        "walking",
-        "dig",
-        "drilling",
-        "axe",
-        "swimming",
-        "hammering",
-      ]);
-      const idleLoader = scene.load.spritesheet(this.spriteKey, url, {
-        frameWidth: 96,
-        frameHeight: 64,
-      });
+      // Smaller sheet: only idle + walking (dig/drill/axe not used in Deep Dungeon).
+      // If the scene preloaded this texture already, textures.exists() was true above
+      // and we never reach this branch. This is only the fallback for level transitions
+      // or when preload failed.
+      const url = getAnimationUrl(this.clothing, ["idle", "walking"]);
 
-      idleLoader.once(`filecomplete-spritesheet-${this.spriteKey}`, () => {
-        if (!scene.textures.exists(this.spriteKey as string) || this.ready) {
-          return;
-        }
-
-        const idle = scene.add
-          .sprite(0, 2, this.spriteKey as string)
-          .setOrigin(0.5);
-        idle.setAlpha(0);
-        this.add(idle);
-        if (this.clothing.aura !== undefined) {
-          this.moveTo(idle, 2);
-        } else if (this.clothing.aura === undefined && this.shadow?.active) {
-          this.moveTo(idle, 1);
-        }
-
-        this.sprite = idle;
-
-        if (this.direction === "left") {
-          this.faceLeft();
-        }
-
+      const onSpriteLoaded = () => {
+        if (!scene.textures.exists(this.spriteKey as string) || this.ready) return;
         this.createIdleAnimation(0, 8);
         this.createWalkingAnimation(9, 16);
-        this.createDigAnimation(17, 29);
-        this.createDrillAnimation(30, 38);
-        this.sprite.play(this.idleAnimationKey as string, true);
-
+        swapSilhouetteToIdle();
+        this.sprite!.play(this.idleAnimationKey as string, true);
         this.ready = true;
-        if (this.silhouette?.active) {
-          this.silhouette?.destroy();
-        }
-        scene.time.delayedCall(150, () => {
-          if (idle.active) idle.setAlpha(1);
+      };
+
+      // Load exactly like attack/hurt: direct URL via the standard Phaser XHR loader
+      // with crossOrigin:"anonymous" (set globally in DeepDungeonGame config).
+      // No fetch+blob needed — the CDN supports CORS (proven by attack/hurt working fine).
+      scene.load.spritesheet(this.spriteKey as string, url, { frameWidth: 96, frameHeight: 64 });
+      scene.load.once(`filecomplete-spritesheet-${this.spriteKey}`, onSpriteLoaded);
+      scene.load.once("loaderror", (file: Phaser.Loader.File) => {
+        if (file.key !== this.spriteKey || this.ready) return;
+        scene.time.delayedCall(3000, () => {
+          if (this.ready) return;
+          scene.load.spritesheet(this.spriteKey as string, url, { frameWidth: 96, frameHeight: 64 });
+          scene.load.once(`filecomplete-spritesheet-${this.spriteKey}`, onSpriteLoaded);
+          scene.load.start();
         });
       });
+      scene.load.start();
 
       // Load micro interactions animations
       const url2 = getAnimationUrl(this.clothing, ["wave", "jump"]);

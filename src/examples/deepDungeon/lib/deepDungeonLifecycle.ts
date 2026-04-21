@@ -47,6 +47,7 @@ export interface DeepDungeonRunResult {
     frankensteinsKilled: number;
     devilsKilled: number;
     crystalsMined: number;
+    chestsOpened: number;
   };
 }
 
@@ -108,6 +109,8 @@ export function applyDeepDungeonGameOver(
     (next.balances[DD_ITEM.DEVILS_KILLED] ?? 0) + s.devilsKilled;
   next.balances[DD_ITEM.CRYSTALS_MINED] =
     (next.balances[DD_ITEM.CRYSTALS_MINED] ?? 0) + s.crystalsMined;
+  next.balances[DD_ITEM.CHESTS_OPENED] =
+    (next.balances[DD_ITEM.CHESTS_OPENED] ?? 0) + s.chestsOpened;
 
   return { ok: true, playerEconomy: next };
 }
@@ -139,6 +142,8 @@ export interface DeepDungeonPlayerStats {
   defense: number;
   criticalChance: number;
   startingPickaxes: number;
+  startingPotions: number;
+  startingKeyChests: number;
 }
 
 const BASE_STATS: DeepDungeonPlayerStats = {
@@ -147,6 +152,8 @@ const BASE_STATS: DeepDungeonPlayerStats = {
   defense: 1,
   criticalChance: 5,
   startingPickaxes: 1,
+  startingPotions: 1,
+  startingKeyChests: 1,
 };
 
 /**
@@ -247,5 +254,5 @@ export function calcPlayerStats(economy: Economy): DeepDungeonPlayerStats {
   if (has(DD_ITEM.TROPHY_DEEPCOIN_EMERALD)) { energy += 5; attack += 1; defense += 1; crit += 2; }
   if (has(DD_ITEM.TROPHY_DEEPCOIN_DIAMOND)) { energy += 5; attack += 1; defense += 1; crit += 2; }
 
-  return { energy, attack, defense, criticalChance: crit, startingPickaxes: pickaxes };
+  return { energy, attack, defense, criticalChance: crit, startingPickaxes: pickaxes, startingPotions: BASE_STATS.startingPotions, startingKeyChests: BASE_STATS.startingKeyChests };
 }

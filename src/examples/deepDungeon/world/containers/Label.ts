@@ -7,16 +7,9 @@ export class Label extends Phaser.GameObjects.Container {
     super(scene, 0, 0);
     this.scene = scene;
 
-    const width = text.length * 4 - 1;
-
-    const name = scene.add.bitmapText(
-      -width / 2,
-      1,
-      "Teeny Tiny Pixls",
-      text,
-      5,
-    );
-    const bounds = name.getBounds();
+    const name = scene.add.bitmapText(0, 1, "Teeny Tiny Pixls", text, 3.2);
+const width = name.getTextBounds(true).local.width; 
+name.setX(-width / 2);
 
     const label = (this.scene.add as any).rexNinePatch({
       x: 0,

@@ -11,7 +11,7 @@ import { DungeonGuide } from "./components/DeepDungeonHUD";
 import { DD_SUNNYSIDE } from "./lib/deepDungeonSunnyside";
 import { PIXEL_SCALE } from "lib/constants";
 
-const COOLDOWN_SECONDS = 86400; // 24 hours
+const COOLDOWN_SECONDS = 43200; // 12 hours
 
 function lsKey(farmId: number) {
   return `dd_free_attempts_last_claim_${farmId}`;

@@ -27,8 +27,8 @@ export type MinigameSessionResponse = {
   farm: {
     balance: string;
     bumpkin?: unknown;
-    /** When the economies API includes it, forwarded to MMO join as `username`. */
     username?: string;
+    faction?: string;
   };
   playerEconomy: {
     balances: Record<string, number>;

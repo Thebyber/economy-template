@@ -16,8 +16,14 @@ export type AnimationKeys =
   | "dead";
 
 export const PLAYER_DAMAGE = 2;
-// Recompensa por avanzar de nivel
 export const REWARD_ENERGY = 15;
+export const POTION_RESTORE = 8;
+
+export const INVENTORY_CAPS = {
+  pickaxe: 15,
+  potion: 10,
+  key_chest: 5,
+} as const;
 export const PORTAL_NAME = "deep-dungeon";
 export const PORTAL_TOKEN = "Deep Token";
 export const UNLIMITED_ATTEMPTS_COST = 3;
@@ -305,12 +311,13 @@ export const LEVEL_SETTINGS: Record<
   11: { fogColor: 0x191a27, fogAlpha: 0.7 },
 };
 export const LEVEL_DESIGNS: Record<number, LevelDesign> = {
+  // P1: 4 slimes + 2 skeletons = 6
   1: {
     enemies: [
-      { type: "SKELETON", count: 1 },
-      { type: "SLIME", count: 7 },
+      { type: "SLIME", count: 4 },
+      { type: "SKELETON", count: 2 },
     ],
-    traps: 5,
+    traps: 3,
     crystals: [
       { type: "pink", level: 1, count: 5 },
       { type: "pink", level: 3, count: 3 },
@@ -319,12 +326,13 @@ export const LEVEL_DESIGNS: Record<number, LevelDesign> = {
     ],
     pickaxes: 3,
   },
+  // P2: 4 slimes + 3 skeletons = 7
   2: {
     enemies: [
+      { type: "SLIME", count: 4 },
       { type: "SKELETON", count: 3 },
-      { type: "SLIME", count: 7 },
     ],
-    traps: 5,
+    traps: 4,
     crystals: [
       { type: "pink", level: 2, count: 4 },
       { type: "pink", level: 4, count: 2 },
@@ -333,13 +341,14 @@ export const LEVEL_DESIGNS: Record<number, LevelDesign> = {
     ],
     pickaxes: 3,
   },
+  // P3: 3 slimes + 3 skeletons + 2 knights = 8
   3: {
     enemies: [
-      { type: "KNIGHT", count: 1 },
-      { type: "SKELETON", count: 5 },
-      { type: "SLIME", count: 5 },
+      { type: "SLIME", count: 3 },
+      { type: "SKELETON", count: 3 },
+      { type: "KNIGHT", count: 2 },
     ],
-    traps: 5,
+    traps: 4,
     crystals: [
       { type: "pink", level: 3, count: 3 },
       { type: "pink", level: 5, count: 1 },
@@ -348,11 +357,12 @@ export const LEVEL_DESIGNS: Record<number, LevelDesign> = {
     ],
     pickaxes: 3,
   },
+  // P4: 2 slimes + 4 skeletons + 3 knights = 9
   4: {
     enemies: [
-      { type: "KNIGHT", count: 3 },
-      { type: "SKELETON", count: 6 },
       { type: "SLIME", count: 2 },
+      { type: "SKELETON", count: 4 },
+      { type: "KNIGHT", count: 3 },
     ],
     traps: 5,
     crystals: [
@@ -363,12 +373,13 @@ export const LEVEL_DESIGNS: Record<number, LevelDesign> = {
     ],
     pickaxes: 3,
   },
+  // P5: 2 slimes + 3 skeletons + 3 knights + 2 franks = 10
   5: {
     enemies: [
-      { type: "FRANKENSTEIN", count: 1 },
-      { type: "KNIGHT", count: 2 },
-      { type: "SKELETON", count: 8 },
       { type: "SLIME", count: 2 },
+      { type: "SKELETON", count: 3 },
+      { type: "KNIGHT", count: 3 },
+      { type: "FRANKENSTEIN", count: 2 },
     ],
     traps: 5,
     crystals: [
@@ -379,12 +390,13 @@ export const LEVEL_DESIGNS: Record<number, LevelDesign> = {
     ],
     pickaxes: 3,
   },
+  // P6: 1 slime + 3 skeletons + 4 knights + 3 franks = 11
   6: {
     enemies: [
-      { type: "FRANKENSTEIN", count: 2 },
-      { type: "KNIGHT", count: 2 },
-      { type: "SKELETON", count: 10 },
-      { type: "DEVIL", count: 1 },
+      { type: "SLIME", count: 1 },
+      { type: "SKELETON", count: 3 },
+      { type: "KNIGHT", count: 4 },
+      { type: "FRANKENSTEIN", count: 3 },
     ],
     traps: 6,
     crystals: [
@@ -395,14 +407,15 @@ export const LEVEL_DESIGNS: Record<number, LevelDesign> = {
     ],
     pickaxes: 3,
   },
+  // P7: 2 skeletons + 5 knights + 4 franks + 1 devil = 12
   7: {
     enemies: [
-      { type: "FRANKENSTEIN", count: 3 },
+      { type: "SKELETON", count: 2 },
       { type: "KNIGHT", count: 5 },
-      { type: "SKELETON", count: 10 },
+      { type: "FRANKENSTEIN", count: 4 },
       { type: "DEVIL", count: 1 },
     ],
-    traps: 7,
+    traps: 6,
     crystals: [
       { type: "white", level: 4, count: 2 },
       { type: "blue", level: 1, count: 5 },
@@ -411,14 +424,15 @@ export const LEVEL_DESIGNS: Record<number, LevelDesign> = {
     ],
     pickaxes: 3,
   },
+  // P8: 2 skeletons + 4 knights + 4 franks + 2 devils = 12
   8: {
     enemies: [
-      { type: "FRANKENSTEIN", count: 3 },
-      { type: "KNIGHT", count: 2 },
-      { type: "SKELETON", count: 10 },
+      { type: "SKELETON", count: 2 },
+      { type: "KNIGHT", count: 4 },
+      { type: "FRANKENSTEIN", count: 4 },
       { type: "DEVIL", count: 2 },
     ],
-    traps: 8,
+    traps: 7,
     crystals: [
       { type: "blue", level: 2, count: 4 },
       { type: "blue", level: 4, count: 2 },
@@ -427,14 +441,15 @@ export const LEVEL_DESIGNS: Record<number, LevelDesign> = {
     ],
     pickaxes: 3,
   },
+  // P9: 1 skeleton + 4 knights + 5 franks + 3 devils = 13
   9: {
     enemies: [
+      { type: "SKELETON", count: 1 },
+      { type: "KNIGHT", count: 4 },
       { type: "FRANKENSTEIN", count: 5 },
-      { type: "KNIGHT", count: 3 },
-      { type: "SKELETON", count: 10 },
       { type: "DEVIL", count: 3 },
     ],
-    traps: 9,
+    traps: 7,
     crystals: [
       { type: "blue", level: 3, count: 3 },
       { type: "blue", level: 5, count: 1 },
@@ -443,14 +458,14 @@ export const LEVEL_DESIGNS: Record<number, LevelDesign> = {
     ],
     pickaxes: 3,
   },
+  // P10: 4 knights + 6 franks + 4 devils = 14
   10: {
     enemies: [
-      { type: "FRANKENSTEIN", count: 5 },
-      { type: "KNIGHT", count: 5 },
-      { type: "SKELETON", count: 10 },
-      { type: "DEVIL", count: 5 },
+      { type: "KNIGHT", count: 4 },
+      { type: "FRANKENSTEIN", count: 6 },
+      { type: "DEVIL", count: 4 },
     ],
-    traps: 10,
+    traps: 8,
     crystals: [
       { type: "blue", level: 4, count: 2 },
       { type: "prismora", level: 1, count: 5 },
@@ -459,14 +474,15 @@ export const LEVEL_DESIGNS: Record<number, LevelDesign> = {
     ],
     pickaxes: 3,
   },
+  // P11: 3 skeletons + 4 knights + 3 franks + 2 devils = 12
   11: {
     enemies: [
-      { type: "FRANKENSTEIN", count: 5 },
-      { type: "KNIGHT", count: 10 },
-      { type: "SKELETON", count: 5 },
-      { type: "DEVIL", count: 5 },
+      { type: "SKELETON", count: 3 },
+      { type: "KNIGHT", count: 4 },
+      { type: "FRANKENSTEIN", count: 3 },
+      { type: "DEVIL", count: 2 },
     ],
-    traps: 10,
+    traps: 8,
     crystals: [
       { type: "pink", level: 1, count: 5 },
       { type: "pink", level: 3, count: 3 },
@@ -475,13 +491,15 @@ export const LEVEL_DESIGNS: Record<number, LevelDesign> = {
     ],
     pickaxes: 3,
   },
+  // P12: 2 skeletons + 5 knights + 3 franks + 2 devils = 12
   12: {
     enemies: [
-      { type: "FRANKENSTEIN", count: 5 },
-      { type: "KNIGHT", count: 12 },
-      { type: "DEVIL", count: 5 },
+      { type: "SKELETON", count: 2 },
+      { type: "KNIGHT", count: 5 },
+      { type: "FRANKENSTEIN", count: 3 },
+      { type: "DEVIL", count: 2 },
     ],
-    traps: 10,
+    traps: 8,
     crystals: [
       { type: "pink", level: 2, count: 4 },
       { type: "pink", level: 4, count: 2 },
@@ -490,13 +508,15 @@ export const LEVEL_DESIGNS: Record<number, LevelDesign> = {
     ],
     pickaxes: 3,
   },
+  // P13: 1 skeleton + 5 knights + 4 franks + 3 devils = 13
   13: {
     enemies: [
-      { type: "FRANKENSTEIN", count: 6 },
-      { type: "KNIGHT", count: 14 },
-      { type: "DEVIL", count: 5 },
+      { type: "SKELETON", count: 1 },
+      { type: "KNIGHT", count: 5 },
+      { type: "FRANKENSTEIN", count: 4 },
+      { type: "DEVIL", count: 3 },
     ],
-    traps: 10,
+    traps: 9,
     crystals: [
       { type: "pink", level: 3, count: 3 },
       { type: "pink", level: 5, count: 1 },
@@ -505,13 +525,14 @@ export const LEVEL_DESIGNS: Record<number, LevelDesign> = {
     ],
     pickaxes: 3,
   },
+  // P14: 5 knights + 5 franks + 3 devils = 13
   14: {
     enemies: [
-      { type: "FRANKENSTEIN", count: 7 },
-      { type: "KNIGHT", count: 15 },
-      { type: "DEVIL", count: 5 },
+      { type: "KNIGHT", count: 5 },
+      { type: "FRANKENSTEIN", count: 5 },
+      { type: "DEVIL", count: 3 },
     ],
-    traps: 10,
+    traps: 9,
     crystals: [
       { type: "white", level: 1, count: 5 },
       { type: "white", level: 3, count: 3 },
@@ -520,13 +541,14 @@ export const LEVEL_DESIGNS: Record<number, LevelDesign> = {
     ],
     pickaxes: 3,
   },
+  // P15: 5 knights + 5 franks + 4 devils = 14
   15: {
     enemies: [
-      { type: "FRANKENSTEIN", count: 7 },
-      { type: "KNIGHT", count: 15 },
-      { type: "DEVIL", count: 5 },
+      { type: "KNIGHT", count: 5 },
+      { type: "FRANKENSTEIN", count: 5 },
+      { type: "DEVIL", count: 4 },
     ],
-    traps: 10,
+    traps: 9,
     crystals: [
       { type: "white", level: 2, count: 4 },
       { type: "white", level: 4, count: 2 },
@@ -535,11 +557,13 @@ export const LEVEL_DESIGNS: Record<number, LevelDesign> = {
     ],
     pickaxes: 3,
   },
+  // P16: 2 skeletons + 4 knights + 4 franks + 3 devils = 13
   16: {
     enemies: [
-      { type: "FRANKENSTEIN", count: 7 },
-      { type: "KNIGHT", count: 15 },
-      { type: "DEVIL", count: 5 },
+      { type: "SKELETON", count: 2 },
+      { type: "KNIGHT", count: 4 },
+      { type: "FRANKENSTEIN", count: 4 },
+      { type: "DEVIL", count: 3 },
     ],
     traps: 10,
     crystals: [
@@ -550,11 +574,12 @@ export const LEVEL_DESIGNS: Record<number, LevelDesign> = {
     ],
     pickaxes: 3,
   },
+  // P17: 5 knights + 5 franks + 4 devils = 14
   17: {
     enemies: [
-      { type: "FRANKENSTEIN", count: 7 },
-      { type: "KNIGHT", count: 15 },
-      { type: "DEVIL", count: 5 },
+      { type: "KNIGHT", count: 5 },
+      { type: "FRANKENSTEIN", count: 5 },
+      { type: "DEVIL", count: 4 },
     ],
     traps: 10,
     crystals: [
@@ -565,11 +590,12 @@ export const LEVEL_DESIGNS: Record<number, LevelDesign> = {
     ],
     pickaxes: 3,
   },
+  // P18: 4 knights + 6 franks + 4 devils = 14
   18: {
     enemies: [
-      { type: "FRANKENSTEIN", count: 7 },
-      { type: "KNIGHT", count: 15 },
-      { type: "DEVIL", count: 5 },
+      { type: "KNIGHT", count: 4 },
+      { type: "FRANKENSTEIN", count: 6 },
+      { type: "DEVIL", count: 4 },
     ],
     traps: 10,
     crystals: [
@@ -580,11 +606,12 @@ export const LEVEL_DESIGNS: Record<number, LevelDesign> = {
     ],
     pickaxes: 3,
   },
+  // P19: 5 knights + 6 franks + 4 devils = 15
   19: {
     enemies: [
-      { type: "FRANKENSTEIN", count: 7 },
-      { type: "KNIGHT", count: 15 },
-      { type: "DEVIL", count: 5 },
+      { type: "KNIGHT", count: 5 },
+      { type: "FRANKENSTEIN", count: 6 },
+      { type: "DEVIL", count: 4 },
     ],
     traps: 10,
     crystals: [
@@ -595,10 +622,11 @@ export const LEVEL_DESIGNS: Record<number, LevelDesign> = {
     ],
     pickaxes: 3,
   },
+  // P20: 5 knights + 6 franks + 5 devils = 16
   20: {
     enemies: [
-      { type: "FRANKENSTEIN", count: 7 },
-      { type: "KNIGHT", count: 15 },
+      { type: "KNIGHT", count: 5 },
+      { type: "FRANKENSTEIN", count: 6 },
       { type: "DEVIL", count: 5 },
     ],
     traps: 10,
@@ -615,32 +643,24 @@ export const LEVEL_DESIGNS: Record<number, LevelDesign> = {
 /**
  * Returns the level design for any level.
  * - Levels 1–20: exact config from LEVEL_DESIGNS.
- * - Levels 21+:  crystals/traps/pickaxes cycle through levels 1–10;
- *                enemies are randomised (harder distribution as level climbs).
+ * - Levels 21+:  same pattern as floors 19-20 (knights/franks/devils) with slight
+ *                random variation (±1 per type) so it never feels identical.
+ *                Crystals/traps cycle through levels 11–20.
  */
 export function getLevelDesign(level: number): LevelDesign {
   if (level <= 20) return LEVEL_DESIGNS[level] ?? LEVEL_DESIGNS[1];
 
-  // Cycle crystals & traps through levels 1–10
-  const baseLevel = ((level - 1) % 10) + 1;
+  // Cycle crystals & traps through levels 11–20
+  const baseLevel = ((level - 11) % 10) + 11;
   const base = LEVEL_DESIGNS[baseLevel];
 
-  // Scale enemy difficulty with level (every 5 levels adds ~2 extra enemies)
-  const extra = Math.floor((level - 21) / 5);
-
-  const devilCount  = 3  + extra + Math.floor(Math.random() * 4);
-  const frankCount  = 5  + extra + Math.floor(Math.random() * 4);
-  const knightCount = 8  + extra + Math.floor(Math.random() * 5);
+  const vary = () => Math.floor(Math.random() * 3) - 1; // -1, 0, or +1
 
   const enemies: EnemyConfig[] = [
-    { type: "KNIGHT",       count: knightCount },
-    { type: "FRANKENSTEIN", count: frankCount },
-    { type: "DEVIL",        count: devilCount },
+    { type: "KNIGHT",       count: Math.max(3, 5 + vary()) },
+    { type: "FRANKENSTEIN", count: Math.max(4, 6 + vary()) },
+    { type: "DEVIL",        count: Math.max(3, 5 + vary()) },
   ];
-
-  // Randomly include lighter enemies at lower probability
-  if (Math.random() > 0.5) enemies.push({ type: "SKELETON", count: 2 + Math.floor(Math.random() * 4) });
-  if (Math.random() > 0.7) enemies.push({ type: "SLIME",    count: 1 + Math.floor(Math.random() * 3) });
 
   return {
     enemies,
@@ -668,6 +688,8 @@ export interface PlayerStats {
   criticalChance: number;
   inventory: {
     pickaxe: number;
+    potion: number;
+    key_chest: number;
     [key: string]: number; // Permite otros items como los cristales
   };
 }
@@ -706,6 +728,20 @@ export const DROP_ITEMS_CONFIG: Record<string, DropItem> = {
       stats.inventory.pickaxe += 1;
     },
   },
+  POTION: {
+    sprite: "potion",
+    label: "+1 Potion",
+    action: (stats) => {
+      stats.inventory.potion += 1;
+    },
+  },
+  KEY_CHEST: {
+    sprite: "key_chest",
+    label: "+1 Key Chest",
+    action: (stats) => {
+      stats.inventory.key_chest += 1;
+    },
+  },
   DEEP_COIN: {
     sprite: "deep_token",
     label: "+1 Deep Coin",
@@ -724,7 +760,7 @@ export interface Card {
   name: string;
   color: string;
   bonus: Record<string, number>;
-  icon: "attack" | "lightning" | "pickaxe" | "crit" | "defense";
+  icon: "attack" | "lightning" | "pickaxe" | "crit" | "defense" | "key_chest" | "potion";
 }
 
 export const CARD_POOL: Card[] = [
@@ -735,6 +771,7 @@ export const CARD_POOL: Card[] = [
   { name: "+1 Pickaxe", type: "Common", color: "#ffffff", bonus: { pickaxe: 1 }, icon: "pickaxe" },
   { name: "+5 Max Energy", type: "Common", color: "#ffffff", bonus: { maxEnergy: 5 }, icon: "lightning" },
   { name: "+8 Max Energy", type: "Common", color: "#ffffff", bonus: { maxEnergy: 8 }, icon: "lightning" },
+  { name: "+1 Potion", type: "Common", color: "#ffffff", bonus: { potion: 1 }, icon: "potion" },
   // Rare
   { name: "+2 Attack", type: "Rare", color: "#4592e5", bonus: { attack: 2 }, icon: "attack" },
   { name: "+10 Max Energy", type: "Rare", color: "#4592e5", bonus: { maxEnergy: 10 }, icon: "lightning" },
@@ -742,6 +779,9 @@ export const CARD_POOL: Card[] = [
   { name: "+5% Critical Chance", type: "Rare", color: "#4592e5", bonus: { criticalChance: 5 }, icon: "crit" },
   { name: "+2 Defense", type: "Rare", color: "#4592e5", bonus: { defense: 2 }, icon: "defense" },
   { name: "+2 Pickaxe", type: "Rare", color: "#4592e5", bonus: { pickaxe: 2 }, icon: "pickaxe" },
+  { name: "+2 Potion", type: "Rare", color: "#4592e5", bonus: { potion: 2 }, icon: "potion" },
+  { name: "+1 Key Chest", type: "Rare", color: "#4592e5", bonus: { key_chest: 1 }, icon: "key_chest" },
+  
   // Epic
   { name: "+3 Attack", type: "Epic", color: "#b145e5", bonus: { attack: 3 }, icon: "attack" },
   { name: "+3 Pickaxe", type: "Epic", color: "#b145e5", bonus: { pickaxe: 3 }, icon: "pickaxe" },
@@ -749,6 +789,8 @@ export const CARD_POOL: Card[] = [
   { name: "+20 Max Energy", type: "Epic", color: "#b145e5", bonus: { maxEnergy: 20 }, icon: "lightning" },
   { name: "+3 Defense", type: "Epic", color: "#b145e5", bonus: { defense: 3 }, icon: "defense" },
   { name: "+7% Critical Chance", type: "Epic", color: "#b145e5", bonus: { criticalChance: 7 }, icon: "crit" },
+  { name: "+3 Potion", type: "Epic", color: "#b145e5", bonus: { potion: 3 }, icon: "potion" },
+  { name: "+2 Key Chest", type: "Epic", color: "#b145e5", bonus: { key_chest: 2 }, icon: "key_chest" },
   // Legendary
   { name: "+5 Attack", type: "Legendary", color: "#ff8c00", bonus: { attack: 5 }, icon: "attack" },
   { name: "+5 Defense", type: "Legendary", color: "#ff8c00", bonus: { defense: 5 }, icon: "defense" },
@@ -756,6 +798,8 @@ export const CARD_POOL: Card[] = [
   { name: "+25 Max Energy", type: "Legendary", color: "#ff8c00", bonus: { maxEnergy: 25 }, icon: "lightning" },
   { name: "+30 Max Energy", type: "Legendary", color: "#ff8c00", bonus: { maxEnergy: 30 }, icon: "lightning" },
   { name: "+5 Pickaxe", type: "Legendary", color: "#ff8c00", bonus: { pickaxe: 5 }, icon: "pickaxe" },
+  { name: "+5 Potion", type: "Legendary", color: "#ff8c00", bonus: { potion: 5 }, icon: "potion" },
+  { name: "+3 Key Chest", type: "Legendary", color: "#ff8c00", bonus: { key_chest: 3 }, icon: "key_chest" },
 ];
 
 export const getRandomCard = (): Card => {
@@ -799,6 +843,7 @@ export const DUNGEON_POINTS = {
     FRANKENSTEIN: 600,
     DEVIL: 1000,
   },
+  CHEST_OPEN: 500,
   LEVEL_REWARD: (level: number) => level * 50,
 };
 
@@ -810,6 +855,16 @@ export const DEEPDUNGEON_NPC_WEARABLES: Equipped = {
   shoes: "Crimstone Boots",
   tool: "Skinning Knife",
   hat: "Skull Hat",
+};
+
+export const BLACKSMITH_NPC_WEARABLES: Equipped = {
+  body: "Light Brown Farmer Potion",
+  hair: "Blacksmith Hair",
+  pants: "Lumberjack Overalls",
+  shirt: "SFL T-Shirt",
+  tool: "Hammer",
+  background: "Pumpkin Plaza Background",
+  shoes: "Brown Boots",
 };
 
 //Guide
@@ -841,6 +896,10 @@ export const INSTRUCTIONS: {
   {
     image: "world/DeepDungeonAssets/Stairs.png",
     description: translate("deepdungeon.instructions6"),
+  },
+  {
+    image: "world/DeepDungeonAssets/chest.png",
+    description: translate("deepdungeon.instructions7"),
   },
 ];
 export const POINTS: {
@@ -885,12 +944,16 @@ export const POINTS: {
     description: translate("deepdungeon.points9"),
   },
   {
-    image: "world/DeepDungeonAssets/Stairs.png",
+    image: "world/DeepDungeonAssets/chest_open.png",
     description: translate("deepdungeon.points10"),
   },
   {
-    image: "world/DeepDungeonAssets/xp.png",
+    image: "world/DeepDungeonAssets/Stairs.png",
     description: translate("deepdungeon.points11"),
+  },
+  {
+    image: "world/DeepDungeonAssets/xp.png",
+    description: translate("deepdungeon.points12"),
   },
 ];
 export const ENEMIES_GUIDE: {
@@ -949,12 +1012,20 @@ export const STATS_GUIDE: {
     description: translate("deepdungeon.stats6"),
   },
   {
-    image: "world/DeepDungeonAssets/greenbar_02.png",
+    image: "world/DeepDungeonAssets/potion.png",
     description: translate("deepdungeon.stats7"),
   },
   {
-    image: "world/DeepDungeonAssets/redbar_02.png",
+    image: "world/DeepDungeonAssets/key_chest.png",
     description: translate("deepdungeon.stats8"),
+  },
+  {
+    image: "world/DeepDungeonAssets/greenbar_02.png",
+    description: translate("deepdungeon.stats9"),
+  },
+  {
+    image: "world/DeepDungeonAssets/redbar_02.png",
+    description: translate("deepdungeon.stats10"),
   },
 ];
 export const MOVE_GUIDE: {

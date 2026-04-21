@@ -14,7 +14,9 @@ export function createDeepDungeonOfflineMinigame(
 
   // A few deep coins and crystals for testing
   base.balances[DD_ITEM.DEEP_COIN] = 50;
-  base.balances[DD_ITEM.PINK_CRYSTAL_1] = 5;
+  base.balances[DD_ITEM.PINK_CRYSTAL_1] = 10;
+  base.balances[DD_ITEM.PINK_CRYSTAL_2] = 10;
+  base.balances[DD_ITEM.PINK_CRYSTAL_3] = 10;
 
   return runtimeToMinigameSession(base);
 }

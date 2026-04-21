@@ -22,7 +22,6 @@ import type { Card } from "./DeepDungeonConstants";
 import { DUNGEON_POINTS } from "./DeepDungeonConstants";
 import { CardSelectorModal } from "./components/CardSelectorModal";
 import { DeepDungeonHUD } from "./components/DeepDungeonHUD";
-import { DD_SUNNYSIDE } from "./lib/deepDungeonSunnyside";
 
 const ENEMY_TYPES_ORDER = ["slime", "skeleton", "knight", "frankenstein", "devil"] as const;
 
@@ -59,7 +58,7 @@ const GameContent: React.FC<GameContentProps> = ({ initialStats }) => {
   const navigate = useNavigate();
   const { farm, farmId } = useMinigameSession();
   const { endRun } = useDeepDungeonLifecycleDispatch();
-  const { addCrystal, addEnemyKill, addDeepCoin, setLevel, buildResult, getProgress } = useDeepDungeonRun();
+  const { addCrystal, addEnemyKill, addDeepCoin, addChestOpen, setLevel, buildResult, getProgress } = useDeepDungeonRun();
 
   const [hudStats, setHudStats] = useState<DeepDungeonRunStats>({
     energy: initialStats.energy,
@@ -67,7 +66,7 @@ const GameContent: React.FC<GameContentProps> = ({ initialStats }) => {
     attack: initialStats.attack,
     defense: initialStats.defense,
     criticalChance: initialStats.criticalChance,
-    inventory: { pickaxe: initialStats.startingPickaxes },
+    inventory: { pickaxe: initialStats.startingPickaxes, potion: initialStats.startingPotions, key_chest: initialStats.startingKeyChests },
     currentLevel: 1,
   });
   const [hudEnemies, setHudEnemies] = useState(0);
@@ -131,8 +130,20 @@ const GameContent: React.FC<GameContentProps> = ({ initialStats }) => {
     phaserApi.onDeepCoinDropped = () => {
       addDeepCoin();
     };
+    phaserApi.onChestOpened = () => {
+      addChestOpen();
+      setHudScore((s) => s + 500);
+      setRerollPoints((s) => s + 500);
+    };
     phaserApi.onOpenCardSelector = () => setShowCardSelector(true);
   });
+
+  const handleUsePotion = useCallback((): boolean => {
+    const game = gameRef.current;
+    if (!game) return false;
+    const scene = game.scene.getScene("deep-dungeon") as import("./DeepDungeonScene").DeepDungeonScene | null;
+    return scene?.usePotion() ?? false;
+  }, []);
 
   const handleCardSelected = useCallback((card: Card) => {
     setShowCardSelector(false);
@@ -152,7 +163,7 @@ const GameContent: React.FC<GameContentProps> = ({ initialStats }) => {
       setClaimError(true);
       return;
     }
-    navigate("/home", { replace: true });
+    navigate("/lobby", { replace: true });
   }, [buildResult, endRun, navigate]);
 
   return (
@@ -173,6 +184,7 @@ const GameContent: React.FC<GameContentProps> = ({ initialStats }) => {
           crystalsMined={hudCrystals}
           score={hudScore}
           progress={getProgress()}
+          onUsePotion={handleUsePotion}
         />
       )}
 
@@ -247,6 +259,15 @@ const GameContent: React.FC<GameContentProps> = ({ initialStats }) => {
                   />
                 )}
 
+                {/* Chests Opened (total) */}
+                {runSnapshot.result.stats.chestsOpened > 0 && (
+                  <SummaryRow
+                    icon="/world/DeepDungeonAssets/chest_open.png"
+                    label="Chests Opened"
+                    value={`+${runSnapshot.result.stats.chestsOpened}`}
+                  />
+                )}
+
                 {/* Crystals */}
                 {Object.entries(runSnapshot.progress.crystals)
                   .filter(([, n]) => n > 0)
@@ -310,7 +331,7 @@ export const DeepDungeonGamePage: React.FC = () => {
 
   useEffect(() => {
     if (!initialStats) {
-      navigate("/home", { replace: true });
+      navigate("/lobby", { replace: true });
     }
   }, [initialStats, navigate]);
 

@@ -31,6 +31,8 @@ interface RunAccumulator {
   frankensteinsKilled: number;
   devilsKilled: number;
   crystalsMined: number;
+  chestsOpened: number;
+  levelChestsOpened: number;
 }
 
 function makeEmptyAccumulator(): RunAccumulator {
@@ -50,6 +52,8 @@ function makeEmptyAccumulator(): RunAccumulator {
     frankensteinsKilled: 0,
     devilsKilled: 0,
     crystalsMined: 0,
+    chestsOpened: 0,
+    levelChestsOpened: 0,
   };
 }
 
@@ -64,6 +68,8 @@ export interface RunProgress {
   totalEnemiesByType: Record<string, number>;
   currentLevel: number;
   deepCoins: number;
+  chestsOpened: number;
+  levelChestsOpened: number;
 }
 
 interface DeepDungeonRunContextValue {
@@ -71,6 +77,7 @@ interface DeepDungeonRunContextValue {
   addCrystal: (crystalKey: string) => void;
   addEnemyKill: (enemyType: EnemyType) => void;
   addDeepCoin: () => void;
+  addChestOpen: () => void;
   setLevel: (level: number) => void;
   buildResult: () => DeepDungeonRunResult;
   getProgress: () => RunProgress;
@@ -124,11 +131,19 @@ export const DeepDungeonRunProvider: React.FC<{ children: ReactNode }> = ({ chil
     acc.current.deepCoins += 1;
   }, []);
 
+  const addChestOpen = useCallback(() => {
+    acc.current.chestsOpened += 1;
+    acc.current.levelChestsOpened += 1;
+    acc.current.score += 500;
+    acc.current.playerXp += 10;
+  }, []);
+
   const setLevel = useCallback((level: number) => {
     acc.current.dungeonLevelReached = level;
     acc.current.score += level * 50;
     acc.current.levelEnemies = {};
     acc.current.levelCrystals = {};
+    acc.current.levelChestsOpened = 0;
   }, []);
 
   const getProgress = useCallback((): RunProgress => {
@@ -146,6 +161,8 @@ export const DeepDungeonRunProvider: React.FC<{ children: ReactNode }> = ({ chil
       },
       currentLevel: a.dungeonLevelReached,
       deepCoins: a.deepCoins,
+      chestsOpened: a.chestsOpened,
+      levelChestsOpened: a.levelChestsOpened,
     };
   }, []);
 
@@ -165,13 +182,14 @@ export const DeepDungeonRunProvider: React.FC<{ children: ReactNode }> = ({ chil
         frankensteinsKilled: a.frankensteinsKilled,
         devilsKilled: a.devilsKilled,
         crystalsMined: a.crystalsMined,
+        chestsOpened: a.chestsOpened,
       },
     };
   }, []);
 
   return (
     <DeepDungeonRunContext.Provider
-      value={{ resetRun, addCrystal, addEnemyKill, addDeepCoin, setLevel, buildResult, getProgress }}
+      value={{ resetRun, addCrystal, addEnemyKill, addDeepCoin, addChestOpen, setLevel, buildResult, getProgress }}
     >
       {children}
     </DeepDungeonRunContext.Provider>

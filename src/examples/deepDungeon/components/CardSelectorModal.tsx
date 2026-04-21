@@ -24,6 +24,8 @@ const getCardIcon = (icon: Card["icon"]): string => {
     case "crit":      return "/world/DeepDungeonAssets/crit.png";
     case "defense":   return "/world/DeepDungeonAssets/shield.png";
     case "pickaxe":   return "/world/DeepDungeonAssets/pickaxe.png";
+    case "key_chest": return "/world/DeepDungeonAssets/key_chest.png";
+    case "potion":    return "/world/DeepDungeonAssets/potion.png";
     default:          return DD_SUNNYSIDE.icons.expression_confused;
   }
 };
@@ -125,12 +127,12 @@ export const CardSelectorModal: React.FC<Props> = ({
             {"Choose one of the three benefits!"}
           </Label>
 
-          <div className="flex gap-3 justify-center mb-5 font-bold">
+          <div className="flex gap-3 justify-center mb-5 font-bold py-3 px-2 overflow-hidden">
             {cards.map((card, i) => (
               <OuterPanel
                 key={`${card.name}-${i}`}
                 onClick={() => handleSelect(card)}
-                className="w-[30vw] max-w-[160px] min-w-[100px] p-2 cursor-pointer hover:scale-105 transition-all flex flex-col items-center"
+                className="flex-1 min-w-0 max-w-[160px] p-3 cursor-pointer hover:scale-105 transition-transform flex flex-col items-center"
                 style={{
                   borderColor: card.color,
                   borderStyle: "solid",
@@ -156,7 +158,8 @@ export const CardSelectorModal: React.FC<Props> = ({
                 {/* Icon */}
                 <img
                   src={getCardIcon(card.icon)}
-                  className="w-9 my-2"
+                  className="w-10 my-2"
+                  style={{ imageRendering: "pixelated" }}
                   alt={card.icon}
                 />
 

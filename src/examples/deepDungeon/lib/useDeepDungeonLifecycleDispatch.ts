@@ -73,6 +73,7 @@ export function useDeepDungeonLifecycleDispatch() {
         [DD_ITEM.FRANKENSTEINS_KILLED]:  nn(result.stats.frankensteinsKilled),
         [DD_ITEM.DEVILS_KILLED]:         nn(result.stats.devilsKilled),
         [DD_ITEM.CRYSTALS_MINED]:        nn(result.stats.crystalsMined),
+        [DD_ITEM.CHESTS_OPENED]:         nn(result.stats.chestsOpened),
       };
       const ok = commitLocalPlayerEconomySync({
         action: actionIds.gameOver,

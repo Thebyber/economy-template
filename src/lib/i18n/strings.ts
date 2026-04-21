@@ -93,13 +93,13 @@ export const EN_STRINGS: Record<string, string> = {
   "deepdungeon.guideDescription": "{{description}}",
 
     
-  "deepdungeon.instructions1": "Explore the Deep Dungeon, but watch your energy!",
+  "deepdungeon.instructions1": "Explore the Deep Dungeon, but watch your energy!.",
   "deepdungeon.instructions2": "You start with 100 energy, and every move will cost you 1 energy.",
   "deepdungeon.instructions3": "Earn points by defeating enemies, clearing dungeon floors, or mining crystals (Pickaxe required).",
   "deepdungeon.instructions4": "Defeating enemies grants random drops, such as Pickaxes or combat stat boosts.",
-  "deepdungeon.instructions5": "Mine crystals to recover energy and survive longer in the depths. You can find 3 pickaxes on each map",
+  "deepdungeon.instructions5": "Mine crystals to recover energy and survive longer in the depths. You can find 3 pickaxes on each map.",
   "deepdungeon.instructions6": "When moving to the next map via the staircase, you win 15 energy and you can choose 1 power-up from 3 random cards.",
-  
+  "deepdungeon.instructions7": "Open chest to win one potion and stats or deep coin! (Key required).",
 
   "deepdungeon.stats1": "Energy is the player's life. If your energy drops to 0, you will lose the run and all progress made in that run.",
   "deepdungeon.stats2": "Life of the enemy.",
@@ -107,8 +107,10 @@ export const EN_STRINGS: Record<string, string> = {
   "deepdungeon.stats4": "Area of Effect of the enemy's attack. If you get close to an enemy with an AoE attack.",
   "deepdungeon.stats5": "Defense of the enemy/player. This reduces the damage taken from attacks.",
   "deepdungeon.stats6": "Critical hit chance of the enemy/player. This is the chance to deal a critical hit. If you're lucky, the final damage is multiplied by 2.",
-  "deepdungeon.stats7": "Damage formula => Life = Attack - Defense ",
-  "deepdungeon.stats8": "Critical hit => Life = (Attack * 2) - Defense",
+  "deepdungeon.stats7": "Restore 8 energy whenever you need it!. Click the potion to use it.",
+  "deepdungeon.stats8": "A key used to unlock chests!.",
+  "deepdungeon.stats9": "Damage formula => Life = Attack - Defense.",
+  "deepdungeon.stats10": "Critical hit => Life = (Attack * 2) - Defense.",
   
   "deepdungeon.enemies1": "Slime: A basic enemy very gelatinous.",
   "deepdungeon.enemies2": "Skeleton: A basic enemy that can be defeated with a few hits.",
@@ -125,12 +127,13 @@ export const EN_STRINGS: Record<string, string> = {
   "deepdungeon.points7": "Knight: Defeating it grants 400 points.",
   "deepdungeon.points8": "Frankenstein: Defeating it grants 600 points.",
   "deepdungeon.points9": "Devil: Defeating it grants 1000 points.",
-  "deepdungeon.points10": "Advancing to the next map grants 50 points, if you reach map 5 you will earn 250 points",
-  "deepdungeon.points11": "Player XP is earned during a run: +5 per crystal mined, +10 per enemy killed.",
+  "deepdungeon.points10": "Opening a chest grants 500 points.",
+  "deepdungeon.points11": "Advancing to the next map grants 50 points, if you reach map 5 you will earn 250 points.",
+  "deepdungeon.points12": "Player XP is earned during a run: +5 per crystal mined, +10 per enemy killed, +10 per chest opened.",
   
   "deepdungeon.move": "Move",
-  "deepdungeon.move1": "Computer version: WASD or arrow keys or swipe to move, mine or attack",
-  "deepdungeon.move2": "Mobile version: Swipe to move, mine or attack",
+  "deepdungeon.move1": "Computer version: WASD or arrow keys or swipe to move, mine or attack.",
+  "deepdungeon.move2": "Mobile version: Swipe to move, mine or attack.",
 };
 
 function interpolate(

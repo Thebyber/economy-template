@@ -2,7 +2,7 @@ import React from "react";
 import { InnerPanel } from "components/ui/Panel";
 import { Label } from "components/ui/Label";
 import { DD_SUNNYSIDE } from "../lib/deepDungeonSunnyside";
-import { ENEMY_TYPES, type EnemyType } from "../lib/Enemies";
+import { ENEMY_TYPES, ENEMY_DEBUT_FLOORS, getScaledEnemyStats, type EnemyType } from "../lib/Enemies";
 import {
   getLevelDesign,
   DUNGEON_POINTS,
@@ -18,6 +18,7 @@ interface ItemSlotProps {
   current: number;
   total: number;
   image: string;
+  level?: number;
   hp?: number;
   atk?: number;
   def?: number;
@@ -26,25 +27,32 @@ interface ItemSlotProps {
   energyDrops?: { amount: number; chance: number }[];
   lootDrops?: { sprite: string; label: string; chance: number }[];
   dropChance?: number;
+  pointsOverride?: number;
+  description?: string;
 }
 
 const DungeonItemSlot: React.FC<ItemSlotProps> = ({
-  name, current, total, image,
+  name, current, total, image, level,
   hp, atk, def, crit, damageAoE,
-  energyDrops, lootDrops, dropChance,
+  energyDrops, lootDrops, dropChance, pointsOverride, description,
 }) => {
   const crystalPoints = DUNGEON_POINTS.CRYSTALS[name as keyof typeof DUNGEON_POINTS.CRYSTALS];
   const enemyPoints = DUNGEON_POINTS.ENEMIES[name.toUpperCase() as keyof typeof DUNGEON_POINTS.ENEMIES];
-  const points = crystalPoints || enemyPoints || 0;
+  const points = pointsOverride ?? crystalPoints ?? enemyPoints ?? 0;
   const isComplete = current >= total;
 
   return (
     <div className="font-bold flex flex-col items-center bg-[#ead4aa] border border-[#754733] p-2 rounded-sm relative w-full h-full min-h-[180px]">
-      {/* NAME */}
-      <div className="w-full flex justify-center items-center mb-2 font-bold">
-        <span className="text-[12px] font-bold text-brown-1100 uppercase text-center leading-tight">
+      {/* NAME + LEVEL */}
+      <div className="w-full flex justify-center items-center gap-1 mb-2 font-bold">
+        <span className="text-[12px] font-bold text-brown-1100 text-center leading-tight capitalize">
           {name.replace(/_/g, " ")}
         </span>
+        {level !== undefined && (
+          <span className="text-[10px] font-bold text-white bg-[#754733] rounded px-1">
+            {`Lv.${level}`}
+          </span>
+        )}
       </div>
 
       {/* IMAGE */}
@@ -55,6 +63,11 @@ const DungeonItemSlot: React.FC<ItemSlotProps> = ({
         onError={(e) => (e.currentTarget.style.display = "none")}
         alt={name}
       />
+
+      {/* DESCRIPTION */}
+      {description && (
+        <span className="text-[11px] font-bold text-brown-700 text-center mb-1">{description}</span>
+      )}
 
       {/* ENEMY STATS */}
       {(hp !== undefined || atk !== undefined || def !== undefined || crit !== undefined || (damageAoE !== undefined && damageAoE > 0)) && (
@@ -112,7 +125,7 @@ const DungeonItemSlot: React.FC<ItemSlotProps> = ({
           </div>
           <div className="flex flex-col gap-0.5">
             {lootDrops.map((drop) => (
-              <div key={drop.sprite} className="flex items-center gap-1 justify-between px-1">
+              <div key={drop.label} className="flex items-center gap-1 justify-between px-1">
                 <div className="flex items-center gap-0.5">
                   <img
                     src={`world/DeepDungeonAssets/${drop.sprite}.png`}
@@ -141,7 +154,7 @@ const DungeonItemSlot: React.FC<ItemSlotProps> = ({
               <div key={drop.amount} className="flex items-center gap-1 justify-between px-1">
                 <div className="flex items-center gap-0.5">
                   <img src={DD_SUNNYSIDE.icons.lightning} className="w-6 h-6" alt="energy" />
-                  <span className="text-[12px] font-bold text-brown-1100">{`+${drop.amount} energy`}</span>
+                  <span className="text-[12px] font-bold text-brown-1100">{`+${drop.amount} Energy`}</span>
                 </div>
                 <span className="text-[12px] font-bold text-green-1100">{drop.chance}{"%"}</span>
               </div>
@@ -166,7 +179,7 @@ const DungeonItemSlot: React.FC<ItemSlotProps> = ({
 // ── Main component ────────────────────────────────────────────────────────────
 
 interface Props {
-  category: "Enemies" | "Crystals";
+  category: "Enemies" | "Crystals" | "Chests";
   progress: RunProgress;
 }
 
@@ -176,13 +189,15 @@ export const DungeonProgress: React.FC<Props> = ({ category, progress }) => {
 
   return (
     <InnerPanel className="flex flex-col h-full overflow-y-auto scrollable p-2 font-bold">
-      <div className="space-y-3 uppercase text-sm">
+      <div className="space-y-3 text-sm">
         <Label
           type="default"
           icon={
             category === "Enemies"
               ? "/world/DeepDungeonAssets/skull.png"
-              : "/world/DeepDungeonAssets/bag_crystal.png"
+              : category === "Crystals"
+              ? "/world/DeepDungeonAssets/bag_crystal.png"
+              : "/world/DeepDungeonAssets/chest.png"
           }
         >
           {`${category} - Map ${currentLevel}`}
@@ -191,19 +206,23 @@ export const DungeonProgress: React.FC<Props> = ({ category, progress }) => {
         <div className="grid grid-cols-2 gap-2">
           {category === "Enemies" &&
             levelData.enemies.map((enemy) => {
-              const staticStats = ENEMY_TYPES[enemy.type.toUpperCase() as EnemyType];
+              const enemyType = enemy.type.toUpperCase() as EnemyType;
+              const baseStats = ENEMY_TYPES[enemyType];
+              const scaledStats = getScaledEnemyStats(enemyType, currentLevel);
+              const debutFloor = ENEMY_DEBUT_FLOORS[enemyType];
+              const enemyLevel = Math.max(1, Math.floor((currentLevel - debutFloor) / 2) + 1);
               const typeKey = enemy.type.toLowerCase();
               const currentCount = progress.enemies[typeKey] ?? 0;
 
               let lootDrops: { sprite: string; label: string; chance: number }[] | undefined;
-              if (staticStats?.lootTable?.length) {
-                const totalWeight = staticStats.lootTable.reduce((s, d) => s + d.weight, 0);
-                lootDrops = staticStats.lootTable.map((d) => {
+              if (baseStats?.lootTable?.length) {
+                const totalWeight = baseStats.lootTable.reduce((s, d) => s + d.weight, 0);
+                lootDrops = baseStats.lootTable.map((d) => {
                   const cfg = DROP_ITEMS_CONFIG[d.key];
                   return {
                     sprite: cfg?.sprite ?? d.key.toLowerCase(),
                     label: cfg?.label ?? d.key,
-                    chance: Math.round(staticStats.dropChance * (d.weight / totalWeight) * 100),
+                    chance: Math.round(baseStats.dropChance * (d.weight / totalWeight) * 100),
                   };
                 });
               }
@@ -211,20 +230,48 @@ export const DungeonProgress: React.FC<Props> = ({ category, progress }) => {
               return (
                 <DungeonItemSlot
                   key={`${currentLevel}-${typeKey}`}
-                  name={staticStats?.name || enemy.type}
+                  name={scaledStats?.name || enemy.type}
                   current={currentCount}
                   total={enemy.count}
                   image={`world/DeepDungeonAssets/${typeKey}.png`}
-                  hp={staticStats?.hp}
-                  atk={staticStats?.damage}
-                  damageAoE={staticStats?.damageAoE}
-                  def={staticStats?.defense}
-                  crit={staticStats?.criticalChance}
+                  level={enemyLevel}
+                  hp={scaledStats?.hp}
+                  atk={scaledStats?.damage}
+                  damageAoE={scaledStats?.damageAoE}
+                  def={scaledStats?.defense}
+                  crit={Math.round((scaledStats?.criticalChance ?? 0) * 100)}
                   lootDrops={lootDrops}
-                  dropChance={staticStats?.dropChance}
+                  dropChance={baseStats?.dropChance}
                 />
               );
             })}
+
+          {category === "Chests" && (() => {
+            return (
+              <div className="col-span-2 flex justify-center">
+                <div className="w-1/2">
+                  <DungeonItemSlot
+                    name="Chest"
+                    current={progress.levelChestsOpened > 0 ? 1 : 0}
+                    total={1}
+                    image="/world/DeepDungeonAssets/chest.png"
+                    pointsOverride={DUNGEON_POINTS.CHEST_OPEN}
+                    description="Requires 1 key to open"
+                    lootDrops={[
+                      { sprite: "potion",     label: "+1 Potion",    chance: 100 },
+                      { sprite: "sword",      label: "+1 Attack",    chance: 25 },
+                      { sprite: "shield",     label: "+1 Defense",   chance: 25 },
+                      { sprite: "crit",       label: "+2% Critical Chance", chance: 25 },
+                      { sprite: "sword",      label: "+2 Attack",           chance: 7  },
+                      { sprite: "shield",     label: "+2 Defense",          chance: 7  },
+                      { sprite: "crit",       label: "+5% Critical Chance", chance: 7  },
+                      { sprite: "deep_token", label: "+1 Deep Coin", chance: 4  },
+                    ]}
+                  />
+                </div>
+              </div>
+            );
+          })()}
 
           {category === "Crystals" &&
             levelData.crystals.map((c) => {

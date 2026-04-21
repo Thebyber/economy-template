@@ -4,6 +4,7 @@ import Decimal from "decimal.js-light";
 import { pixelDarkBorderStyle } from "lib/style";
 import { PIXEL_SCALE } from "lib/constants";
 import { Label } from "./Label";
+import { SUNNYSIDE } from "assets/ui/sunnyside";
 
 const INNER = 14;
 
@@ -40,7 +41,6 @@ export const Box: React.FC<{
         className={classNames(
           "relative flex items-center justify-center bg-brown-600",
           onClick && "cursor-pointer hover:brightness-95",
-          isSelected && "ring-2 ring-[#ffb01e]",
         )}
         style={{
           width: `${PIXEL_SCALE * (INNER + 4)}px`,
@@ -72,6 +72,7 @@ export const Box: React.FC<{
           draggable={false}
           style={{ imageRendering: "pixelated" }}
         />
+
         {showLabel && (
           <div
             className="absolute z-10 pointer-events-none"
@@ -93,6 +94,38 @@ export const Box: React.FC<{
           </div>
         )}
       </div>
+
+      {/* SFL-style corner selection overlay — positioned on outer div like the main game */}
+      {isSelected && (
+        <>
+          <img
+            className="absolute pointer-events-none"
+            src={SUNNYSIDE.ui.selectBoxTL}
+            style={{ top: `${PIXEL_SCALE * 1}px`, left: `${PIXEL_SCALE * 0}px`, width: `${PIXEL_SCALE * 8}px` }}
+            alt=""
+          />
+          {!showLabel && (
+            <img
+              className="absolute pointer-events-none"
+              src={SUNNYSIDE.ui.selectBoxTR}
+              style={{ top: `${PIXEL_SCALE * 1}px`, left: `${PIXEL_SCALE * INNER}px`, width: `${PIXEL_SCALE * 8}px` }}
+              alt=""
+            />
+          )}
+          <img
+            className="absolute pointer-events-none"
+            src={SUNNYSIDE.ui.selectBoxBL}
+            style={{ top: `${PIXEL_SCALE * INNER}px`, left: `${PIXEL_SCALE * 0}px`, width: `${PIXEL_SCALE * 8}px` }}
+            alt=""
+          />
+          <img
+            className="absolute pointer-events-none"
+            src={SUNNYSIDE.ui.selectBoxBR}
+            style={{ top: `${PIXEL_SCALE * INNER}px`, left: `${PIXEL_SCALE * INNER}px`, width: `${PIXEL_SCALE * 8}px` }}
+            alt=""
+          />
+        </>
+      )}
     </div>
   );
 };
